@@ -6,9 +6,8 @@
 3. EVREN_URL ve EVREN_ANAHTAR ortam değişkenleri (G-011 bunu bekliyor).
 
 ## Durum (26.11)
-- Bitti: G-017 Sözlükçü 9 dönem sözlüğünü kaydetti, her pilot eser için başvuru sırası kuruldu. G-019 kasaya Arapça birim tablosu eklendi.
-- G-016: archive.org'da 5 telifsiz tarama bulundu (Fusûs 1883 baskısı adayı, Cürcânî, Kâşânî, Tehânevî); indirme alt sunuculara takıldı, 4 sunucu izne eklendi, yeniden deneniyor.
-  Bulak 1252 ve İstanbul 1304 Fusûs baskıları archive.org'da yok.
-- Sürüyor: G-020 Mümeyyiz şemanın son denetimi. Sırada: G-018 OCR denemesi (indirme bitince), G-015.
-- Not: indirmeler başka sunuculara yönlenirse tek tek izin yerine Ayarlar'dan *.archive.org izni gerekebilir.
-- Türkçe çeviriler sizin taramanızı bekliyor. Bekliyor: G-003, G-011 (EVREN_URL eksik).
+- Öncelik düzeltildi: asıl iş Türkçe çevirilerin hangi Arapça baskıdan yapıldığını bulmak. Kütüphaneci şu an bunu arıyor (G-021):
+  tanıtım yazıları, çevirmen/neşreden makaleleri, Google Books önsöz önizlemeleri, İSAM ve TYEK katalogları (ağ izni eklendi).
+- Arapça taramalar (yan iş, bitti): Kâşânî Istılâhât, Cürcânî Ta'rîfât, Tehânevî Keşşâf indirildi; OCR denemesi yapıldı (matbu kullanılabilir, litografi değil).
+- Şema son denetimi: şartlı kabul; iki küçük düzeltme kaldı (lisansı bilinmeyen baskı kasaya; değişiklik notu zorunlu). G-021'in arkasından.
+- Sözlükçü 9 dönem sözlüğünü ve eser başına başvuru sırasını kurdu.
