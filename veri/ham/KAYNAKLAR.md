@@ -1,6 +1,6 @@
 # veri/ham/KAYNAKLAR.md (G-016, kutuphaneci, 2026-11-26, v1)
 
-DURUM (v2): Keşif TAMAM. 2/5 öncelikli öğe indirildi (060267, 146529; bölüm 'İNDİRİLENLER'). Diğer 3'ü yeni alt alanlar yüzünden engelli (bölüm ENGEL).
+DURUM (v3): Keşif TAMAM. 5/5 öncelikli öğe indirildi (bölüm 'İNDİRİLENLER' ve 'v3'). 'ENGEL (v2)' bölümü artık TARİHİDİR: o alan adları sonradan izinlendi ve indirme başarılı oldu. Henüz denenmeyenler: AAlexandrina-151950, -188000.
 Aşağıdaki sha1 değerleri archive.org metadata API'sinin bildirdiği değerlerdir (indirilen dosyadan hesaplanmadı); indirme sonrası sha256 hesaplanıp eklenecek.
 Telif gerekçesi sütunu bir ön değerlendirmedir, hukuki hüküm değildir: baskı yılı eski (<=1938 tarihli) ve çağdaş tahkik/editör emeği görünmüyor; eserlerin müellifleri 8.-12./14.-18. yüzyıl. Tarihler archive.org künyesinden, DOĞRULANMADI (sayfa görüntüsünden teyit yok).
 
@@ -61,3 +61,20 @@ Künye teyidi (ilk sayfalar):
 - dn710409.ca.archive.org (AAlexandrina-170380 Fusûs Hintçe tercümeli 1894)
 - dn721804.ca.archive.org (AAlexandrina-163318 Keşşâf 1862)
 Reis'in eklediği dört alan adı (dn711002.ca, dn721900.ca, dn760109.eu, ia801506.us) çalıştı. Her öğenin dağıtım sunucusu farklı olduğundan, sürdürülebilir çözüm `*.archive.org` jokeri. 151950 (ikinci Keşşâf kopyası) ve 188000 denenmedi.
+
+## İNDİRİLENLER (v3, 2026-11-26)
+| Kimlik | Dosya | sha256 | Sayfa |
+|---|---|---|---|
+| AAlexandrina-195100 | kaynak.pdf | ba1d4195784b1350cfd8cfa8b0a9f15d0bcc5fddea0b985635bc4a1f04eb0492 | 200 |
+| AAlexandrina-195100 | ocr.txt | 1101d7f209c8900f6ef2c8d565465fbfc4bf73f963bd8ab9ac990e73e1650f11 | -- |
+| AAlexandrina-170380 | kaynak.pdf | 6e413df76a33ff318a61a522067c39efda1fbbc5058ba5ffe67e568239efce60 | 484 |
+| AAlexandrina-170380 | ocr.txt | e5e1a6aec0d8538728add6f6ad710e6200be487e30a878fd1b2898610d3d14a6 | -- |
+| AAlexandrina-163318 | kaynak.pdf | 7e0adc3ab0753da6344f9317fb23a071e05a0751dfe32ff5c285a92222048b3e | 844 |
+| AAlexandrina-163318 | ocr.txt | dccb6691ecc58b2b7d3e1c92638b4edbb3b4a7cd10dcd51cee67a43b4e61a631 | -- |
+Boyutlar metadata ile uyuştu. Yeni engel çıkmadı (dn711007.ca, dn710409.ca, dn721804.ca çalıştı).
+
+Künye teyidi:
+- 195100: OCR'da "Seyyid eş-Şerîf Ali b. Muhammed el-Cürcânî ... et-Ta'rîfât ... ve beyân risâle ... el-Fütûhât'taki (ıstılahlar)" ; "Mustafa Efendi'nin zimmetine, Ezher civarında Mısır'da basıldı". Ta'rîfât metni "Bâbü'l-elif"ten başlıyor. Yani Mısır baskısı, sonunda/arkasında Fütûhât ıstılahları risâlesi (Ta'rîfât'ın bu baskısına eklenmiş; risâlenin müellifi DOĞRULANMADI). Yıl sayfadan okunmadı (arşiv: 1903). Dikkat: ilave risâle kapsam notu; tek başına Ta'rîfât değildir.
+- 170380: Başlık sayfası (s.6, görsel): "Fusûsü'l-hikem" ve "Kunûz-ı Esrâr el-Kadem" (Hint dilinde tercüme/şerh), "Matba' Ahmedî ... Delhi (okunması zayıf)". Arapça metin + Urdu/Fârisî tercüme; OCR bozuk. Saf Arapça Fusûs matni olarak KULLANILAMAZ; matnin içerik olarak tam olup olmadığı DOĞRULANMADI. Matn çıkarımı için sayfa düzeni incelenmeli (Musahhih).
+- 163318: Giriş: "Bismillâh... ibâre: bu kitapta Keşşâf'ın ... dört tertip (el-Mu'cem)" ve içindekiler harf sıralı maddeler; sayfa 844. Künye Keşşâf ile uyumlu (Kalküta 1862 arşiv künyesi; başlık sayfası okunmadı, DOĞRULANMADI). OCR orta kalite.
+Not: üç dosyada da ilk görsel sayfalar kapak/boş; künye OCR ve s.6 görselinden çıkarıldı.
