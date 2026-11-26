@@ -1,21 +1,22 @@
 # E-001 Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi
 
-- Kimlik/sürüm: E-001 v1 (2026-11-26, kutuphaneci, G-001)
+- Kimlik/sürüm: E-001 v2 (2026-11-26, kutuphaneci, G-008). v1: G-001.
 - Eser: İbnü'l-Arabî, Fusûsu'l-hikem; Türkçe tercüme ve şerh: Ahmed Avni Konuk
-- Müellif vefat: İbnü'l-Arabî 638/1240 (genel bilgi, bu oturumda kaynakla doğrulanmadı); Konuk 1938 (doğrulanmadı, TDV maddesinden teyit edilecek)
-- Arapça baskı(lar): doğrulanmadı. Şerh, Fusûs metnini paragraf paragraf Arapça verir; hangi neşre (veya nüshaya) dayandığı doğrulanmadı.
-- Tahkik eden (Arapça): doğrulanmadı
-- Türkçe yayın: Mustafa Tahralı ve Selçuk Eraydın neşri (yeni harfe aktarma, notlar, fihristler). Konya Mevlânâ Müzesi Ktp. yazması esas alınmış (kaynak: TDV İA "Konuk, Ahmet Avni", arama özeti; maddenin kendisi okunamadı, ağ engeli).
-  - TDV özetine göre İstanbul'da 4 cilt, 1. cilt 1987, sonrakiler 1994 ve 1999 (cilt-yıl eşlemesi doğrulanmadı).
-  - Marmara Üniv. İlahiyat Fakültesi Vakfı (Dergah), 6. baskı 2013 (kütüphane kaydı); cilt 1: 18.05.2017, ISBN 9789755480374, 520 s.; cilt 3: ISBN 9789755480398, 584 s. (Kitapyurdu kaydı).
-  - Türkiye Yazma Eserler Kurumu Başkanlığı, 2017, ISBN 9789751738822 ve 9789751738905 (kataloglarda 2 cilt, bir makalede I-IV; tutarsız, doğrulanmadı).
-- Çevirmenin dayandığı baskı (önsöz): doğrulanmadı. Önsöz/mukaddime fiziksel kopyadan okunmalı.
-- Sayfa numarası eşlemesi: doğrulanmadı. Yapı gereği Arapça paragraf + Türkçe yan yana; paragraf hizası hazır olma beklentisi (proje/kararlar.md) denetlenmedi.
-- Dijital kaynak: doğrulanmadı (PDF/yayınevi dosyası elde değil). Yayınevi adayları: Marmara Üniv. İlahiyat Vakfı, TYEK.
-- Telif/lisans: HUKUKİ SORU (bkz. ozet.md). Konuk'un vefatı 1938 ise asıl metin için koruma süresi sorusu ayrı; Tahralı-Eraydın aktarımı, notları ve fihristleri ayrı hak doğurabilir. Hüküm verilmedi.
+- Müellif vefat: İbnü'l-Arabî 638/1240; Konuk 6 Mart 1938, İstanbul (TDV İA "Konuk, Ahmet Avni", DİA XXVI, s. 180-182; okundu 2026-11-26). Not: TDV doğum tarihi için üç farklı yıl veriyor (1285/1287/1288 h).
+- Şerhin telifi: Konuk büyük boy 28 defter olarak yazmış, "12-13 yıllık çalışmadan sonra 1928'de tamamlamış" (TDV İA, aynı madde). Yazma: Konya Mevlânâ Müzesi Ktp. nr. 3853-3880; İstanbul Atatürk Kitaplığı, Osman Ergin nr. 79/1-27.
+- Basılı neşir (BİRİNCİL İZ, TDV İA'dan): "Kitap, Konya Mevlânâ Müzesi'ndeki nüshası esas alınarak Mustafa Tahralı ve Selçuk Eraydın tarafından yeni harflere aktarılıp gerekli notlar, indeks ve lugatçeler ilâve edilerek dört cilt halinde İstanbul'da yayımlanmıştır (I, 1987, 1994, 1999; II, 1989, 1997; III, 1990; IV, 1992)." Bu cümle ansiklopedi maddesindendir (ikincil kaynak); neşrin kendi önsözünden teyit edilmedi.
+- Arapça baskı(lar) / çevirmenin dayandığı Arapça metin: TESPİT EDİLEMEDİ. Neden: (1) Konuk'un şerhi kendi yazmasında Fusûs metnini paragraf paragraf verir; Konuk'un hangi Arapça neşre/nüshaya dayandığı hiçbir ulaşılan kaynakta yazmıyor. (2) Önsöz/mukaddime elde yok. ÇIKARIM (ikincil, kesin değil): Şerh 1928'de tamamlandığına göre Afîfî'nin tahkikli neşri (Kahire 1946, TDV İA "Fusûsü'l-hikem") Konuk'un dayanağı olamaz; TDV'ye göre Afîfî'den önceki basılar Kahire 1252 ve İstanbul 1304 neşirleridir, ama Konuk'un bunlardan birini kullandığı doğrulanmadı.
+- Tahkik eden (Arapça): yok/doğrulanmadı. Yeni harfli neşrin hazırlayanları Tahralı-Eraydın'dır; bu Türkçe aktarım ve not işidir, Arapça tahkik değildir (kaynak: TDV İA).
+- Önsöz bilgileri: TDV bibliyografyasına göre Eraydın'ın "Ahmed Avni Konuk Hayatı ve Eserleri" yazısı I. cilt s. XV-XXVIII; Tahralı'nın "Fusûsu'l-hikem, Şerhi ve Vahdet-i Vücud ile Alâkalı Bazı Mes'eleler" yazısı I. cilt s. XXXVI vd.; Eraydın'ın IV. cilt önsözü s. 27-62 (TDV Fusûs maddesi). Yani dayanılan nüsha/baskı bilgisi için okunacak yerler: I. cilt önsözü (s. XV-XXVIII ve XXXVI civarı) ve IV. cilt önsözü. Bu sayfalar OKUNMADI.
+- Türkçe yayın künyesi (v1'den, katalog/ikincil): Marmara Üniv. İlahiyat Fakültesi Vakfı, 6. baskı 2013; cilt 1: 2017, ISBN 9789755480374, 520 s.; cilt 3: ISBN 9789755480398, 584 s. TYEK 2017, ISBN 9789751738822 ve 9789751738905 (cilt sayısı tutarsız, doğrulanmadı). TDV: 4 cilt.
+- Sayfa numarası eşlemesi: doğrulanmadı. Yapı gereği Arapça paragraf + Türkçe birlikte; denetlenmedi, fiziksel kopya gerekir.
+- Dijital kaynak: doğrulanmadı (PDF/yayınevi dosyası elde değil).
+- Telif/lisans: HUKUKİ SORU (bkz. ozet.md). Konuk 1938'de vefat etmiş; asıl metin için süre sorusu ayrı; Tahralı-Eraydın aktarımı, notları, fihristleri ayrı hak doğurabilir. Hüküm verilmedi.
+- ÖNSÖZ BEKLİYOR: evet (I. ve IV. cilt önsözleri; Arapça metin dayanağı için).
 - Kaynaklar:
-  - https://islamansiklopedisi.org.tr/konuk-ahmet-avni (arama özeti)
-  - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-i/39454.html
+  - https://islamansiklopedisi.org.tr/konuk-ahmet-avni (okundu, birincil değil: ansiklopedi)
+  - https://islamansiklopedisi.org.tr/fususul-hikem (okundu)
+  - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-i/39454.html (v1; bu oturumda ağ izni yok, yeniden açılamadı)
   - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-iii/51370.html
   - https://cir.nii.ac.jp/crid/1130000795811384576?lang=en
   - https://katalog.bilecik.edu.tr/bib/30021
