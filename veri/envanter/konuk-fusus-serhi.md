@@ -1,6 +1,6 @@
 # E-001 Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi
 
-- Kimlik/sürüm: E-001 v3 (2026-11-26, kutuphaneci, G-012: şerh-asıl bağı eklendi). v2: G-008. v1: G-001.
+- Kimlik/sürüm: E-001 v4 (2026-11-26, Reis, G-021: dayanılan metin birincil teyitle). v3: G-012. v2: G-008. v1: G-001.
 - Eser: İbnü'l-Arabî, Fusûsu'l-hikem; Türkçe tercüme ve şerh: Ahmed Avni Konuk
 - Tür: ŞERH/çeviri. Asıl eser: Fusûsu'l-hikem Arapça ana metni = E-006 (`ust_eser_kimlik = E-006`). Bu kayıt yalnızca Konuk'un şerhini kapsar; ana metin tanıklıkları E-006'ya bağlanır (G-006 Ş2, G-012).
 - Müellif vefat: İbnü'l-Arabî 638/1240; Konuk 6 Mart 1938, İstanbul (TDV İA "Konuk, Ahmet Avni", DİA XXVI, s. 180-182; okundu 2026-11-26). Not: TDV doğum tarihi için üç farklı yıl veriyor (1285/1287/1288 h).
@@ -28,3 +28,10 @@
 - Birincil olmayan, doğrulanmış (okundu): Karaaslan, Tasavvuf Dergisi 41 (2018) s. 122: "Tahralı ve Eraydın, eserin ilk neşrinde Arapça metni her cildin sonuna vermiş" (https://dergipark.org.tr/en/download/article-file/1476853); 2017 neşir: Konuk'un el yazması (Konya Mevlânâ Müzesi 3853-3880) esas, 2 cilt çeviriyazı + 2 cilt tıpkıbasım. Alkan, TALİD 15/30 (2017) 211-240 dn. 115-116, M. Nedim Tan–E. Alkan'ın "Tıpkıbasımı Hakkında" yazısına (c. 1, s. 7-13) gönderiyor: o yazı da okunacak (https://dergipark.org.tr/en/download/article-file/1011701).
 - Not: çeviri yazı neşrinde 3853-3880 (28 defter) ile 3853-3867 (14 defter) tutarsızlığı arama özetlerinde var; doğrulanmadı.
 - Denenip sonuç vermeyenler: DergiPark makaleleri (Karaaslan, Alkan, Alkan H. kitap tanıtımı), TDV İA, Kitapyurdu (403 bot engeli), Google Books (ağ dışı), İSAM katalog (ağ dışı).
+
+## Dayanılan Arapça metin (G-021, BİRİNCİL)
+- Konuk hazır bir neşir kullanmamış: "şârih Ahmed Avni Bey'in kullandığı metin farklı Fusûs şerhlerinden hareketle kendisinin meydana getirdiği tercihli bir metindir." (TYEK neşri, 1. cilt, önsöz s. XVII–XVIII)
+- Mevcut neşir ve şerhlerden ayrıldığı yerlerde "daha çok Abdullah Bosnevî'yi tâkip etmektedir." (aynı yer, dn. 2)
+- Neşirciler metni Afîfî, Abdülaziz Sultân el-Mansûb ve Kılıç–Alkış neşirleriyle karşılaştırmış; son karşılaştırma Kılıç–Alkış'la. Harekeleme: Hârizmî ve Câmî şerhlerinin harekeli neşirleri, Kayserî şerhi Milli Ktp. (Adana İl Halk) nr. 100.
+- Şerhin yazması: Konya Mevlânâ Müzesi Ktp. 3853–3880 (Fusûs metninin ayrı yazma numarası önsözde yok).
+- Sonuç: Hizalamada Arapça taraf, Konuk neşrinin içindeki Arapça metindir (çeviriyle aynı ciltte); ayrı bir basılı Fusûs neşri aranmaz. Kaynak PDF: TYEK e-kitap (veri/dayanak_baski.md'de adres), kasada.

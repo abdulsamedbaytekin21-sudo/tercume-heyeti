@@ -1,6 +1,6 @@
 # E-004 Konevî, Miftâhu'l-gayb (+ E-005 Fenârî şerhine bkz.)
 
-- Kimlik/sürüm: E-004 v2 (2026-11-26, kutuphaneci, G-008). v1: G-001.
+- Kimlik/sürüm: E-004 v3 (2026-11-26, Reis, G-021: yayıncı kaydı). v2: G-008. v1: G-001.
 - Eser: Sadreddin Konevî, Miftâhu ġaybi'l-cem'i ve'l-vücûd fi'l-keşfi ve'ş-şühûd (tam ad: TDV İA "Miftâhu'l-gayb", Reşat Öngören, DİA XXX, s. 16-17). Türkçe: "Tasavvuf Metafiziği".
 - Müellif vefat: Konevî 673/1274 (TDV İA).
 - Arapça neşirler (İKİNCİL, TDV İA "Miftâhu'l-gayb"): "Eser iki defa İran'da neşredilmiştir. Şeyh Ahmed eş-Şîrâzî tarafından gerçekleştirilen ilki Molla Fenârî'nin ... Miṣbâḥu'l-üns ... şerhin kenarında (Tahran 1323), Muhammed Hâcevî tarafından gerçekleştirilen ikincisi de yine Molla Fenârî'nin şerhiyle birlikte basılmıştır (Tahran 1416 h./1374 hş.)." Ayrıca TDV "Sadreddin Konevî" maddesi: "Muhammed Hâcevî tarafından Molla Fenârî'nin şerhiyle birlikte tahkikli olarak yayımlanmış (Tahran 1374 hş.)". Yazma görseli: Süleymaniye Ktp., Hacı Mahmud Efendi nr. 2334.
@@ -24,3 +24,7 @@
 - 2002 baskı: BULUNAMADI. (Yayınevi de doğrulanmadı.)
 - Ek ikincil: Hâcevî neşri için bir arama özeti "Tahran 1995" diyor (TDV: 1416 h./1374 hş.; tutarlı sayılabilir, doğrulanmadı).
 - ÖNSÖZ BEKLİYOR: 2002 baskı için evet; TYEK 2014/2025 için YEK ürün sayfası/PDF örneği ağ izniyle okunabilir.
+
+## Dayanılan Arapça metin (G-021, yayıncı kaydı; önsöz okunmadı)
+- TYEK ürün sayfası: "Yazma Nüshası: Süleymaniye Yazma Eser Ktp., Ayasofya Koleksiyonu, No. 1930"; yayın türü "Çeviri - Tıpkıbasım"; çevirinin bu nüsha esas alınarak hazırlandığı belirtiliyor. Hâcevî neşrine dayandığına dair işaret yok.
+- Açık: çeviri önsözü (doğrudan teyit) ve 2002 baskısının dayanağı.
