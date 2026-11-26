@@ -1,6 +1,6 @@
 # veri/ham/KAYNAKLAR.md (G-016, kutuphaneci, 2026-11-26, v1)
 
-DURUM: Keşif ve künye TAMAM; İNDİRME YAPILAMADI (ağ engeli, aşağıda). Hiçbir dosya indirilmedi; bu yüzden sha256 YOK.
+DURUM (v2): Keşif TAMAM. 2/5 öncelikli öğe indirildi (060267, 146529; bölüm 'İNDİRİLENLER'). Diğer 3'ü yeni alt alanlar yüzünden engelli (bölüm ENGEL).
 Aşağıdaki sha1 değerleri archive.org metadata API'sinin bildirdiği değerlerdir (indirilen dosyadan hesaplanmadı); indirme sonrası sha256 hesaplanıp eklenecek.
 Telif gerekçesi sütunu bir ön değerlendirmedir, hukuki hüküm değildir: baskı yılı eski (<=1938 tarihli) ve çağdaş tahkik/editör emeği görünmüyor; eserlerin müellifleri 8.-12./14.-18. yüzyıl. Tarihler archive.org künyesinden, DOĞRULANMADI (sayfa görüntüsünden teyit yok).
 
@@ -42,3 +42,22 @@ Dışarıda bırakılanlar (çağdaş/telifli, indirilmez): Cürcânî Dâru'l-K
 1. `*.archive.org` izni (dn*.ca/eu/us.archive.org, ia*.us.archive.org) gelince önce AAlexandrina-060267, -170380, -195100, -146529, -163318 indirilecek; sha256 ve sayfa sayısı yazılacak; ilk sayfalarla künye teyit edilecek.
 2. Bulak 1252 / İstanbul 1304 Fusûs matn baskısı için başka kütüphane kaynağı aranacak.
 3. Telif durumu hukuki soru olarak ozet.md H-6 ile birlikte kalır.
+
+## İNDİRİLENLER (v2, 2026-11-26; git dışı, veri/ham/<kimlik>/kaynak.pdf ve ocr.txt)
+Boyutlar archive.org metadata ile birebir uyuştu. sha256 indirilen dosyadan hesaplandı.
+| Kimlik | Dosya | sha256 | Sayfa (pdfinfo) |
+|---|---|---|---|
+| AAlexandrina-060267 | kaynak.pdf | 9b1653b4478b5758e61b48b8b6d20d11d79f48171c1fc4153e055202f3db232d | 442 |
+| AAlexandrina-060267 | ocr.txt | 7cee9deeaba8571b3221d75fe0e9f66300b36747c89e3f41b0e115c871d2458b | -- |
+| AAlexandrina-146529 | kaynak.pdf | 53e343569d7c82bf8a3e6b5fb12c03923e127f7d217b5eaf05ff8217932edf5b | 176 |
+| AAlexandrina-146529 | ocr.txt | 4014166d87dda62811ab6e4c3b33847b97f4633992b2e48a06082679d03cf821 | -- |
+
+Künye teyidi (ilk sayfalar):
+- 060267: Taş baskı (litografi) görünümü; süslü başlık sayfası (s.5) "şerh Fusûs el-hikem" yazıyor; arka planda matn ile şerh iç içe. METİN DEĞİL, ŞERH baskısı. OCR (Arapça/Farsça karışık, bozuk) ilk sayfalarda "el-Kâşânî" ismini veriyor: Kâşânî şerhi olması MUHTEMEL, DOĞRULANMADI. Matn şerhin içine gömülü olduğundan bağımsız Fusûs matni olarak KULLANILAMAZ. Baskı yeri/yılı sayfalardan okunmadı (arşiv künyesi: 1300 [1883], yayıncı yok). OCR kalitesi kullanılamaz düzeyde (el yazısı/taş baskı); Musahhih işi.
+- 146529: Başlık sayfası OCR'ı: "Kitâb Istılâhâti's-sûfiyye, Kemâleddîn Ebi'l-Ganâim Abdürrezzâk b. Kemâleddîn el-Kâşî es-Semerkandî"; önsözde Fusûs şerhi ve te'vilât'tan söz ediliyor. Künye eserle uyumlu. Baskı yeri/yılı sayfadan teyit edilmedi (arşiv: [1845]). OCR ilk sayfada okunur, kalite sonradan ölçülmeli.
+
+## ENGEL (v2, yeni): redirect alt alanları, proxy 403
+- dn711007.ca.archive.org (AAlexandrina-195100 Ta'rîfât 1903)
+- dn710409.ca.archive.org (AAlexandrina-170380 Fusûs Hintçe tercümeli 1894)
+- dn721804.ca.archive.org (AAlexandrina-163318 Keşşâf 1862)
+Reis'in eklediği dört alan adı (dn711002.ca, dn721900.ca, dn760109.eu, ia801506.us) çalıştı. Her öğenin dağıtım sunucusu farklı olduğundan, sürdürülebilir çözüm `*.archive.org` jokeri. 151950 (ikinci Keşşâf kopyası) ve 188000 denenmedi.
