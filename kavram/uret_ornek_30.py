@@ -2,7 +2,9 @@ import json, sys
 sys.path.insert(0, "/home/user/tercume-heyeti/metin")
 from normallestir import normalize_ar
 
-DEG = {"tarih": "2026-11-26", "yapan": "istilahci", "kart": "G-006"}
+SURUM = 2
+DEG = {"tarih": "2026-11-26", "yapan": "istilahci", "kart": "G-013",
+       "onceki": "G-006 (sürüm 1)", "ozet": "G-006 denetim şartları Ş1-Ş3, K1, K2: durum=taslak; Fusûs ana metin tanıklıkları E-006; Konuk dönemi h14; harf-i tarifsiz lemma; IST-I-0009 karsit->ilgili"}
 DN = "doğrulanmadı"
 FASS = {
  "adem": "1. Fass-ı Âdemî (hikmet-i ilâhiyye)",
@@ -19,10 +21,10 @@ FASS = {
 }
 # tanıklık kaynakları: ekol/dönem burada, anlamda değil
 KAYNAK = {
- "fusus": dict(eser="E-001", eser_not="Fusûsu'l-hikem Arapça metni; Konuk şerhi (E-001) içindeki Arapça paragraflar üzerinden. Dayanılan Arapça baskı G-001'de doğrulanmadı.",
+ "fusus": dict(eser="E-006", eser_not="Fusûsu'l-hikem Arapça ana metni (E-006; veri/envanter/fusus-ana-metin.md). Dayanılan Arapça baskı doğrulanmadı (E-001/E-002 önsözleri bekliyor).",
                muellif="İbnü'l-Arabî", muellif_vefat="638/1240 (genel bilgi, doğrulanmadı)", ekol="ekol:ekberi", donem="donem:h7"),
  "konuk": dict(eser="E-001", eser_not="Konuk'un Türkçe şerhi (şârih yorumu, ana metin değil).",
-               muellif="Ahmed Avni Konuk", muellif_vefat="1938 (doğrulanmadı)", ekol="ekol:ekberi", donem="donem:m20"),
+               muellif="Ahmed Avni Konuk", muellif_vefat="1938 (doğrulanmadı)", ekol="ekol:ekberi", donem="donem:h14"),
 }
 
 # (lafız, okunuş, kök[], dil_türü, terim_notu, [anlamlar])
@@ -74,7 +76,7 @@ T = [
  ("استعداد", "isti'dâd", ["ع د د"], "isim (mastar, istif'âl)", "", [
    ("Bir aynın, sâbit hakikatinden gelen ve feyzi ancak kendi ölçüsünde almasını belirleyen kabiliyeti.", "yuksek", "Fass-ı Âdemî ve Şîsî'de tecellî ve kabil kavramlarıyla birlikte işlenir.", [("fusus", "adem", ""), ("fusus", "sis", "")]),
  ]),
- ("القابل", "el-kâbil", ["ق ب ل"], "isim (ism-i fâil)", "İlgili: قابلية (kâbiliyyet).", [
+ ("قابل", "kâbil", ["ق ب ل"], "isim (ism-i fâil)", "İlgili: قابلية (kâbiliyyet).", [
    ("Feyzi kabul eden mahal; kabul edenin kendisi de feyz-i akdesten gelir.", "orta", "Kavram açık; terimin isti'dâd ile ayrı terim olarak tutulması insan kararı gerektirebilir.", [("fusus", "adem", "")]),
  ]),
  ("تجلي", "tecellî", ["ج ل و"], "isim (mastar, tefa''ul)", "", [
@@ -112,7 +114,7 @@ T = [
  ("الإله المعتقد", "el-ilâhü'l-mu'teked", ["أ ل ه", "ع ق د"], "isim tamlaması (sıfatlı)", "Lafız varyantı: 'el-ilâhü'l-mahlûk fi'l-i'tikâdât'. Hangi kalıbın Fusûs'ta geçtiği teyit edilmedi.", [
    ("İnançlarda yaratılmış ilâh: her inanan Hakk'ı kendi inancının biçimiyle sınırlar; kalbin kabı inancın şeklini belirler.", "orta", "Kavram açık; lafız kalıbı ve yeri teyitsiz.", [("fusus", "suayb", "Yer varsayımdır.")]),
  ]),
- ("الخيال", "el-hayâl", ["خ ي ل"], "isim", "", [
+ ("خيال", "hayâl", ["خ ي ل"], "isim", "", [
    ("Âlemin (kevn) bir hayâl olması, duyulurun tabir gerektiren bir rüya gibi okunması; 'insanlar uykudadır, ölünce uyanırlar'.", "yuksek", "Fass-ı Yûsufî'nin konusu.", [("fusus", "yusuf", "")]),
  ]),
  ("تعبير", "ta'bîr", ["ع ب ر"], "isim (mastar, tef'îl)", "", [
@@ -121,7 +123,7 @@ T = [
  ("تخلل", "tahallül", ["خ ل ل"], "isim (mastar, tefa''ul)", "Halîl (Hz. İbrâhîm) adıyla kök ilişkisi üzerinden.", [
    ("Hakk'ın kulun sûretlerine/sıfatlarına ve kulun Hakk'ın isimlerine nüfuz etmesi; 'halîl' adının bu nüfuzla açıklanması.", "yuksek", "Fass-ı İbrâhîmî'nin açılış kavramı.", [("fusus", "ibrahim", "")]),
  ]),
- ("الرحمة", "rahmet", ["ر ح م"], "isim", "", [
+ ("رحمة", "rahmet", ["ر ح م"], "isim", "", [
    ("Rahmet-i imtinân: hiçbir amele karşılık olmaksızın lütfen verilen, her şeyi kuşatan rahmet (Rahmân).", "orta", "Ayrım Fass-ı Süleymânî'de işlenir; ıstılah adları (imtinân/vücûb) ana metindeki lafızla teyit edilmedi.", [("fusus", "suleyman", "")]),
    ("Rahmet-i vücûb: Hakk'ın kendi üzerine yazdığı, amele karşılık verilen rahmet (Rahîm).", "orta", "Aynı gerekçe.", [("fusus", "suleyman", "")]),
  ]),
@@ -136,7 +138,7 @@ ILISKI = [
  ("ilgili", "IST-A-0014-1", "IST-A-0016-1", "yuksek", "Tecellî isti'dâd ölçüsünde alınır."),
  ("ilgili", "IST-A-0011-2", "IST-A-0010-1", "dusuk", "Ayn'ın 2. anlamı a'yân-ı sâbitenin tekili olabilir; birleştirme kararı insan incelemesinde."),
  ("ilgili", "IST-A-0007-1", "IST-A-0006-1", "yuksek", "Hilâfet insan-ı kâmilin mertebesidir."),
- ("karsit", "IST-A-0030-1", "IST-A-0030-2", "orta", "İmtinân ve vücûb rahmetleri Fass-ı Süleymânî'de ikili olarak işlenir."),
+ ("ilgili", "IST-A-0030-1", "IST-A-0030-2", "orta", "İmtinân ve vücûb rahmetleri karşıt değil, aynı cinsin (rahmetin) iki türüdür; Fass-ı Süleymânî'de birlikte anılır (G-006 Ö3/Ş3)."),
  ("sarih_yorumu", "IST-A-0001-2", "IST-A-0001-1", "dusuk", "Fass = nebînin kalbi yorumu, bölüm birimi anlamına şerhten eklenen katmandır."),
 ]
 
@@ -144,11 +146,11 @@ out = []
 nt = na = nn = 0
 for i, (lafiz, okunus, kok, tur, notu, anlamlar) in enumerate(T, 1):
     tid = f"IST-T-{i:04d}"
-    out.append(dict(tur="terim", kimlik=tid, surum=1, lafiz=lafiz, lafiz_harekesiz=normalize_ar(lafiz),
+    out.append(dict(tur="terim", kimlik=tid, surum=SURUM, lafiz=lafiz, lafiz_harekesiz=normalize_ar(lafiz),
                     okunus=okunus, kok=kok, dil_turu=tur, not_=notu or None, degisiklik=DEG)); nt += 1
     for k, (tanim, g, ger, tlist) in enumerate(anlamlar, 1):
         aid = f"IST-A-{i:04d}-{k}"
-        out.append(dict(tur="anlam", kimlik=aid, surum=1, terim=tid, sira=k, tanim=tanim, guven=g, gerekce=ger,
+        out.append(dict(tur="anlam", kimlik=aid, surum=SURUM, terim=tid, sira=k, tanim=tanim, guven=g, gerekce=ger,
                         inceleme="insan" if g == "dusuk" else None, degisiklik=DEG)); na += 1
         assert tlist, aid
         for m, (kay, fass, ek) in enumerate(tlist, 1):
@@ -156,7 +158,7 @@ for i, (lafiz, okunus, kok, tur, notu, anlamlar) in enumerate(T, 1):
             yer = FASS[fass] if fass else DN
             g_ger = "Baskı, cilt ve sayfa doğrulanmadı; dayanılan Arapça baskı belirlenmedi (G-001). Fass ataması baskıdan okunmadı."
             if ek: g_ger += " " + ek
-            out.append(dict(tur="taniklik", kimlik=f"IST-N-{i:04d}-{k}-{m}", surum=1, anlam=aid, eser=src["eser"],
+            out.append(dict(tur="taniklik", kimlik=f"IST-N-{i:04d}-{k}-{m}", surum=SURUM, anlam=aid, eser=src["eser"],
                             eser_not=src["eser_not"], baski=DN, cilt=DN, sayfa=DN, yer=yer, alinti=None,
                             muellif=src["muellif"], muellif_vefat=src["muellif_vefat"], ekol=src["ekol"],
                             donem=src["donem"], cift_id=None, guven="dusuk", gerekce=g_ger, inceleme="insan",
@@ -164,10 +166,11 @@ for i, (lafiz, okunus, kok, tur, notu, anlamlar) in enumerate(T, 1):
 ids = {r["kimlik"] for r in out}
 for j, (tk, a, b, g, ger) in enumerate(ILISKI, 1):
     assert a in ids and b in ids, (a, b)
-    out.append(dict(tur="iliski", kimlik=f"IST-I-{j:04d}", surum=1, tur_kenar=tk, kaynak=a, hedef=b, guven=g,
+    out.append(dict(tur="iliski", kimlik=f"IST-I-{j:04d}", surum=SURUM, tur_kenar=tk, kaynak=a, hedef=b, guven=g,
                     gerekce=ger, inceleme="insan" if g == "dusuk" else None, degisiklik=DEG))
 with open("/home/user/tercume-heyeti/veri/kavram/ornek_30.jsonl", "w", encoding="utf-8") as f:
     for r in out:
         r = {("not" if k == "not_" else k): v for k, v in r.items()}
+        d = r.pop("degisiklik"); r["durum"] = "taslak"; r["degisiklik"] = d
         f.write(json.dumps(r, ensure_ascii=False) + "\n")
 print(nt, na, nn, len(ILISKI))
