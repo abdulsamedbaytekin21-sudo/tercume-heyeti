@@ -38,6 +38,13 @@
       "model": "opus"
     },
     {
+      "id": "sozlukcu",
+      "ad": "Sözlükçü",
+      "harf": "ل",
+      "rol": "Sözlükleri dönemine göre kaydeder; çevrilen eseri, orijinalin yazıldığı dönemin sözlükleriyle kıyaslar.",
+      "model": "sonnet"
+    },
+    {
       "id": "mimar",
       "ad": "Mimar",
       "harf": "م",

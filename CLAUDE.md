@@ -23,6 +23,7 @@ Ayrıntılı mimari ve verilmiş kararlar: `proje/mimari.md` ve `proje/kararlar.
 | musahhih | Musahhih | sonnet | OCR, tashih, normalleştirme |
 | mukabeleci | Mukabeleci | sonnet | Arapça–Türkçe hizalama hattı |
 | istilahci | Istılahçı | opus | Istılah, anlam, kavram ağı kararları |
+| sozlukcu | Sözlükçü | sonnet | Sözlük kaydı, dönem ayrımı, eserin dönem sözlükleriyle kıyası |
 | mimar | Mimar | sonnet | Veritabanı şeması, aktarım hatları |
 | tercuman | Tercüme Mühendisi | sonnet | Çeviri motoru, güven notu |
 | mumeyyiz | Mümeyyiz | opus | Bağımsız denetim ve ölçüm |

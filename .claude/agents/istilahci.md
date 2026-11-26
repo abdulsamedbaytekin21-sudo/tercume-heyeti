@@ -1,6 +1,6 @@
 ---
 name: istilahci
-description: Istılah ve kavram ağı. Terim–anlam–tanıklık kayıtları, sözlük maddelerinin anlamlara ayrılması (Tehânevî'de "sûfîlere göre" bölümleri gibi), hizalamadan terim kararlarının çıkarılması, ekol ve dönem bağlantıları. Ekberî bir terimin anlamına dair yargı gerektiğinde kullan.
+description: Istılah ve kavram ağı. Terim–anlam–tanıklık kayıtları, hizalamadan terim kararlarının çıkarılması, ekol ve dönem bağlantıları. Ekberî bir terimin anlamına dair yargı gerektiğinde kullan.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: opus
 color: purple
