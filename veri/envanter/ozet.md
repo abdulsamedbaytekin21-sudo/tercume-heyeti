@@ -31,3 +31,6 @@ Her biri için istenen: önsöz sayfaları, iç kapak/künye sayfası, varsa "Ar
 2. Kitapyurdu erişimi (kitapyurdu.com ağ izin listesinde değil): yayınevi/ISBN teyidi için eklenmeli ya da kullanıcı iç kapak fotoğrafı vermeli.
 3. Nusûs ve Demirli Fusûs yayınevi/yıl teyidi.
 4. Konuk'un Arapça Fusûs metni için nüsha incelemesi (Konya Mevlânâ Müzesi nr. 3853 vd.) - Mümeyyiz/Istılahçı kararı.
+
+## G-021 notu (2026-11-26)
+Dayanılan Arapça metin: E-001 (Konuk'un kendi Fusûs metni, ikincil), E-004 (TYEK 2014: Ayasofya 1930 yazması, ikincil okundu) bulundu; E-002, E-003 bulunamadı. Ayrıntı: dayanak_baski.md.

@@ -18,3 +18,9 @@
   - https://www.kitapyurdu.com/kitap/tasavvuf-metafizigi-miftahulgayb/743644.html (v1)
   - https://katalog.bilecik.edu.tr/bib/47751
   - https://dergipark.org.tr/tr/pub/cuid/article/356917
+
+## G-021 güncellemesi (2026-11-26, kutuphaneci) — dayanılan Arapça metin
+- BULGU (İKİNCİL, okundu): TYEK 2014 baskısı için: "Prof. Dr. Ekrem Demirli tarafından Türkçeye çevrilen eserin Süleymaniye Yazma Eser Kütüphanesi, Ayasofya Koleksiyonu, 1930 numarada kayıtlı bulanan ve Fatih Sultan Mehmed için yazılan yazma nüshası, çeviriyle karşılıklı bir şekilde neşredilmiştir." (Özpilavcı, Türkiye Yazma Eserler Kurumu Başkanlığı Yayımları [tanıtım], BEÜ İlahiyat Fak. Dergisi 2/2 (2015) s. 368; https://dergipark.org.tr/tr/download/article-file/434549). Yani 2014 baskıda Arapça yüz, Ayasofya 1930 yazmasının tıpkıbasımıdır (basılı neşir değil). Çevirinin bu yazmadan mı yoksa Hâcevî neşrinden mı yapıldığı bu kaynakta açık yazmıyor; birincil önsöz okunmadı. Ayrıca bir arama özeti YEK ürün sayfasında "Ayasofya 1930 esas alınarak" dediğini aktarıyor (https://ekitap.yek.gov.tr/urun/miftahu-l-gayb--ikinci-baski-_857.aspx; erişilemedi, doğrulanmadı); ikinci baskı 2025, ISBN 978-975-17-3749-6 (doğrulanmadı).
+- 2002 baskı: BULUNAMADI. (Yayınevi de doğrulanmadı.)
+- Ek ikincil: Hâcevî neşri için bir arama özeti "Tahran 1995" diyor (TDV: 1416 h./1374 hş.; tutarlı sayılabilir, doğrulanmadı).
+- ÖNSÖZ BEKLİYOR: 2002 baskı için evet; TYEK 2014/2025 için YEK ürün sayfası/PDF örneği ağ izniyle okunabilir.

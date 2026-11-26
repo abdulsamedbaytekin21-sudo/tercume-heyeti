@@ -13,3 +13,7 @@
   - https://islamansiklopedisi.org.tr/sadreddin-konevi (okundu: eserler 7 ve bibliyografya)
   - https://islamansiklopedisi.org.tr/miftahul-gayb (okundu)
   - https://dergipark.org.tr/en/pub/isad/article/1077646 (v1, dolaylı)
+
+## G-021 güncellemesi (2026-11-26, kutuphaneci) — dayanılan Arapça metin
+- SONUÇ: BULUNAMADI. Âştiyânî neşri (Tahran 1342 hş.) TDV'de anılan tek tahkikli neşirdir; Demirli çevirisinin onu esas aldığına dair kaynak yok.
+- Denenen: WebSearch (Âştiyânî + Demirli + "Vahdet-i Vücûd ve Esasları"); sonuç yok. Bir Kitapyurdu kaydı "Vahdet-i Vücudun İlkeleri" (https://www.kitapyurdu.com/kitap/vahdeti-vucudun-ilkeleri/701812.html; arama özeti: Konevî'den cümleler; çevirmen/neşir belirtilmiyor) bulundu; E-003 ile aynı eser olduğu DOĞRULANMADI. Kitapyurdu doğrudan okunamadı (403).

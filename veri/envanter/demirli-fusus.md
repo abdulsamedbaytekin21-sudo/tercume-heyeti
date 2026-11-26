@@ -16,3 +16,9 @@
   - https://www.idefix.com/fususul-hikem-p-1160959 (arama özeti)
   - https://dergipark.org.tr/en/pub/rid/article/1603211 (arama özeti; bibliyografyadaki Kabalcı 2006 künyesi)
   - https://www.kitapyurdu.com/kitap/fususulhikem/84501.html
+
+## G-021 güncellemesi (2026-11-26, kutuphaneci) — dayanılan Arapça metin
+- SONUÇ: BULUNAMADI. Ne birincil (önsöz erişilemedi) ne ikincil kaynakta Demirli'nin hangi Arapça neşri/nüshayı esas aldığı yazıyor.
+- Denenen: WebSearch (3 sorgu, standart+genişletilmiş): Kitapyurdu/İdefix/1000kitap/Nadirkitap/Alfa/Kabalcı tanıtım metinleri (yalnız "yorumcuların görüşlerine de yer verir" düzeyi), Ömer Lekesiz eleştirisi (Yeni Şafak, https://www.yenisafak.com/yazarlar/omer-lekesiz/ekrem-demirlinin-fuss-cevirisi-29376; ağ dışı, okunamadı; arama özeti anlam kayması ve üslup eleştirisi diyor, neşir bilgisi yok), DergiPark makaleleri, TDV İA. Google Books önsöz önizlemesi: books.google.com ağ dışı (ENOTFOUND, proxy 403); googleapis kotası dolu (429).
+- Baskı bilgisi (ikincil, arama özeti): Kabalcı 2006 (ISBN 9789759970727), Kabalcı 2013, Alfa 2019 2. baskı (568 s.). Doğrulanmadı.
+- Sonraki adım: Ömer Lekesiz yazısı ve Google Books için ilgili alan adlarına izin, ya da önsöz fotoğrafı.

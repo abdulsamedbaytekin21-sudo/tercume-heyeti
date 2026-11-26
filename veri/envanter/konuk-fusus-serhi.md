@@ -21,3 +21,10 @@
   - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-iii/51370.html
   - https://cir.nii.ac.jp/crid/1130000795811384576?lang=en
   - https://katalog.bilecik.edu.tr/bib/30021
+
+## G-021 güncellemesi (2026-11-26, kutuphaneci) — dayanılan Arapça metin
+- SONUÇ (İKİNCİL, arama özeti; birincil sayfa erişilemedi): Konuk'un Fusûs metni hazır bir basılı neşrin kopyası değil; kendi kurduğu tercihli metin. Neşre hazırlayanlar (2017 TYEK) metni Afîfî, Abdülazîz Sultân el-Mansûb ve Kılıç–Alkış (TİEM 1933) neşirleriyle karşılaştırmış; "Ahmed Avni Bey, Fusûs metnini inşâ ederken mevcut neşirler ve şerhlerden ayrıştığı yerlerde daha çok Abdullah Bosnevî'yi tâkip etmektedir" (WebSearch özetinin aktardığı cümle; AYNEN TEYİT EDİLMEDİ). Farklar dipnotlarda tek tek gösteriliyor.
+- Birincil kaynak (önsöz niteliğinde, OKUNAMADI): TYEK 2017 neşri 1. cilt PDF örneği https://ekitap.yek.gov.tr/Uploads/ProductsFiles/27d472d7-9e77-4698-bfb2-c823bf0f34f8.pdf (2. cilt: .../e5354d97-dbdb-40eb-bff6-494f9c77b4e5.pdf). ekitap.yek.gov.tr bu oturumda ağ izni dışında (proxy 403, WebFetch ENOTFOUND). Yanıt için bu ana ağ izni gerek.
+- Birincil olmayan, doğrulanmış (okundu): Karaaslan, Tasavvuf Dergisi 41 (2018) s. 122: "Tahralı ve Eraydın, eserin ilk neşrinde Arapça metni her cildin sonuna vermiş" (https://dergipark.org.tr/en/download/article-file/1476853); 2017 neşir: Konuk'un el yazması (Konya Mevlânâ Müzesi 3853-3880) esas, 2 cilt çeviriyazı + 2 cilt tıpkıbasım. Alkan, TALİD 15/30 (2017) 211-240 dn. 115-116, M. Nedim Tan–E. Alkan'ın "Tıpkıbasımı Hakkında" yazısına (c. 1, s. 7-13) gönderiyor: o yazı da okunacak (https://dergipark.org.tr/en/download/article-file/1011701).
+- Not: çeviri yazı neşrinde 3853-3880 (28 defter) ile 3853-3867 (14 defter) tutarsızlığı arama özetlerinde var; doğrulanmadı.
+- Denenip sonuç vermeyenler: DergiPark makaleleri (Karaaslan, Alkan, Alkan H. kitap tanıtımı), TDV İA, Kitapyurdu (403 bot engeli), Google Books (ağ dışı), İSAM katalog (ağ dışı).
