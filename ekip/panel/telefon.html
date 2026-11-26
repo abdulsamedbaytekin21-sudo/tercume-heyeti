@@ -395,8 +395,13 @@ function coz(payload){
     t = t.result ?? t.text ?? t.content?.[0]?.text ?? JSON.stringify(t);
   }
   t = String(t);
-  const m = t.match(/<untrusted-data-[^>]+>\s*([\s\S]*?)\s*<\/untrusted-data-/);
-  return JSON.parse(m ? m[1] : t);
+  const kapanis = t.lastIndexOf("</untrusted-data-");
+  if(kapanis >= 0){
+    const bas = t.lastIndexOf("<untrusted-data-", kapanis);
+    const ic = t.slice(t.indexOf(">", bas) + 1, kapanis).trim();
+    return JSON.parse(ic);
+  }
+  return JSON.parse(t);
 }
 function satir(payload){ const r = coz(payload); return Array.isArray(r) ? r[0] : r; }
 function tazelik(){
