@@ -27,7 +27,7 @@ TATWEEL = "ـ"
 PERSIAN = set("پچژگکیھہۀ")
 SUP_MAX = 8.0          # üst indis boyu (altı = dipnot çağrısı)
 BODY_MIN = 10.4        # gövde Türkçe boyu (Garamond 11.5, Nimbus 10.6)
-HEADER_TOP = 60
+HEADER_TOP = 70
 
 
 # Scheherazade alt kümesinde أَ ve أُ tek glif (CID) olup metin katmanında yalnız U+0623 görünür.
@@ -79,7 +79,7 @@ def split_runs(chars):
     (>10pt) ya da ileri büyük boşlukta (>20pt, beyit hemistişleri) böler.
     Türkçede: satır değişince / x geri sıçrayınca.
     """
-    runs, cur, mode, last = [], [], None, None
+    runs, cur, mode, last, lastb = [], [], None, None, None
     for c in chars:
         m = "ar" if is_ar(c) else "tr"
         brk = False
@@ -93,19 +93,39 @@ def split_runs(chars):
                     if abs(c["top"] - last["top"]) > 8 or c["x0"] < last["x0"] - 10 or c["x0"] - last["x1"] > 20:
                         brk = True
             else:
-                small = c["size"] < SUP_MAX or last["size"] < SUP_MAX
-                if c["x0"] < last["x0"] - 15 or (not small and abs(c["bottom"] - last["bottom"]) > 5):
+                small = c["size"] < SUP_MAX
+                if c["x0"] < last["x0"] - 15 or (not small and lastb is not None and abs(c["bottom"] - lastb["bottom"]) > 5):
                     brk = True
         if brk:
             runs.append((mode, cur))
             cur = []
+            lastb = None
         mode = m
         cur.append(c)
         if not (m == "ar" and is_mark(c["text"])):
             last = c
+            if m == "tr" and c["size"] >= SUP_MAX:
+                lastb = c
     if cur:
         runs.append((mode, cur))
     return runs
+
+
+def _taban_ata(chars):
+    """Hemzeli elif (أ إ آ) metin katmanında sıfır genişlikli hemze + ayrı elif tabanı (U+FFFD ya da ا,
+    lam-elif ligatüründeki ا dahil) olarak gelir. Her hemzenin tabanını bulur: önce akışta sonraki,
+    yoksa önceki harf; taban U+FFFD ya da ا olmalı ve hemze x'i tabanın genişliğine düşmeli."""
+    atilacak = set()
+    for i, c in enumerate(chars):
+        if c["text"] not in HAMZA_ALEF:
+            continue
+        for j in (i + 1, i - 1):
+            if 0 <= j < len(chars) and j not in atilacak and chars[j]["text"] in (FFFD, "ا"):
+                b = chars[j]
+                if b["x0"] - 1.0 <= c["x0"] <= b["x1"] + 0.3:
+                    atilacak.add(j)
+                    break
+    return atilacak
 
 
 def ar_logical(chars):
@@ -115,15 +135,13 @@ def ar_logical(chars):
     """
     ham = "".join(c["text"] for c in chars)
     out = []
-    n = len(chars)
+    atilacak = _taban_ata(chars)
     for i, c in enumerate(chars):
         t = c["text"]
-        if t == FFFD:
-            pair = False
-            for j in (i - 1, i + 1):
-                if 0 <= j < n and chars[j]["text"] in HAMZA_ALEF and abs(chars[j]["x0"] - c["x0"]) < 2:
-                    pair = True
-            t = "" if pair else "ا"
+        if i in atilacak:
+            t = ""
+        elif t == FFFD:
+            t = "ا"
         elif t in HAMZA_ALEF:
             cid = cid_of(c)
             if cid is not None:
@@ -134,16 +152,14 @@ def ar_logical(chars):
     return ham, clean_ar(s)
 
 
-LAM_ALEF_HAMZA = re.compile("ل" + "ا" + "([\u064b-\u065f\u0670]*)([أإآ])")
-
-
 def clean_ar(s):
     s = s.replace(TATWEEL, "")
-    # لأ/لإ bağlaç glifi: "ل" + ا (taban) + ayrı hemze -> tek hemzeli elif
-    s = LAM_ALEF_HAMZA.sub(lambda m: "ل" + m.group(2) + m.group(1), s)
+    # شيء: ي ile ء arasına giren ayırıcı boşluk (glif aralığı) kaldırılır
+    s = re.sub("(ي[\u064b-\u065f]*) (?=[\u064b-\u065f]*ء)", r"\1", s)
     s = unicodedata.normalize("NFKC", s)   # sunum biçimleri varsa standarda
     s = unicodedata.normalize("NFC", s)
     s = re.sub(r"\s+", " ", s).strip()
+    s = re.sub("^[\u064b-\u065f\u0670 ]+", "", s)   # satır başına kaçan yetim hareke
     return s
 
 
@@ -190,6 +206,11 @@ def tr_line_text(chars, mark_notes):
     return ham, "".join(out)
 
 
+def aile(yazi):
+    """Yazı tipi ailesi: italik/normal Garamond aynı paragrafta kalır."""
+    return "nimbus" if "Nimbus" in yazi else ("bold" if "Bold" in yazi else "garamond")
+
+
 def page_blocks(pg):
     """Bir sayfa için blok listesi: (tur, dil, ham, temiz, top, x0, boyut, yazi)."""
     chars = [c for c in pg.chars if c["text"] != "\x00"]
@@ -221,10 +242,11 @@ def page_blocks(pg):
             tr_lines.append({"top": top, "x0": x0, "boyut": big, "yazi": fn, "ham": ham, "tem": tem})
     # Türkçe satırları paragraflara topla
     tr_lines.sort(key=lambda l: l["top"])
+    ar_tops = [b["top"] for b in blocks if b["tur"] == "arapca"]
     body_left = min([l["x0"] for l in tr_lines if l["top"] > HEADER_TOP and l["boyut"] >= BODY_MIN] or [68])
     paras = []
     for l in tr_lines:
-        if l["top"] < HEADER_TOP and l["boyut"] <= 9.5:
+        if l["top"] < HEADER_TOP:
             if paras and paras[-1]["tur"] == "baslik_sayfa":
                 paras[-1]["satirlar"].append(l)
             else:
@@ -237,8 +259,9 @@ def page_blocks(pg):
         else:
             yeni = (not paras or paras[-1]["tur"] in ("baslik_sayfa", "dipnot")
                     or l["x0"] > body_left + 5
-                    or l["yazi"] != paras[-1]["satirlar"][-1]["yazi"]
-                    or l["top"] - paras[-1]["satirlar"][-1]["top"] > 20)
+                    or aile(l["yazi"]) != aile(paras[-1]["satirlar"][-1]["yazi"])
+                    or l["top"] - paras[-1]["satirlar"][-1]["top"] > 20
+                    or any(paras[-1]["satirlar"][-1]["top"] - 5 <= a <= l["top"] - 5 for a in ar_tops))
             if yeni:
                 paras.append({"tur": "gövde", "satirlar": [l]})
             else:
@@ -265,8 +288,29 @@ def page_blocks(pg):
         return (round(b["top"] / 6), -b["x0"] if b["tur"] == "arapca" else b["x0"])
     ar_idx = [b for b in blocks if b["tur"] == "arapca"]
     # Arapça blokları kendi aralarında satır kümesine göre sırala
-    blocks.sort(key=lambda b: (b["top"] if b["tur"] != "arapca" else round(b["top"] / 6) * 6, -b["x0"] if b["tur"] == "arapca" else 0))
+    for b in blocks:
+        if b["dil"] == "tr" and re.fullmatch(r"\[\d+/\d+\]", b["metin"]):
+            b["tur"] = "isaret"   # Arapça satır içine giren "[6/45]" Fusûs bölüm/sayfa işareti
+    satirda = ("arapca", "isaret")
+    blocks.sort(key=lambda b: (round(b["top"] / 6) * 6 if b["tur"] in satirda else b["top"], -b["x0"] if b["tur"] in satirda else 0))
     return blocks
+
+
+def ocr_sayfa(pdf_yolu, n, dil="eng"):
+    """Metin katmanı olmayan ama mürekkep taşıyan sayfa için Tesseract (G-018 yöntemi). Yoksa None."""
+    import glob
+    import subprocess
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        subprocess.run(["pdftoppm", "-r", "300", "-gray", "-f", str(n), "-l", str(n), "-png", pdf_yolu, d + "/s"], check=True)
+        png = glob.glob(d + "/s*.png")[0]
+        from PIL import Image
+        im = Image.open(png).convert("L")
+        koyu = sum(1 for v in im.resize((im.width // 4, im.height // 4)).tobytes() if v < 160)
+        if koyu < 200:
+            return None
+        r = subprocess.run(["tesseract", png, "-", "-l", dil, "--psm", "6"], capture_output=True, text=True)
+        return r.stdout.strip() or None
 
 
 def basili_no(blocks):
@@ -295,6 +339,10 @@ def main(argv=None):
         son = a.son or len(pdf.pages)
         for n in range(a.ilk, son + 1):
             bl = page_blocks(pdf.pages[n - 1])
+            if not bl and not pdf.pages[n - 1].chars:
+                t = ocr_sayfa(a.pdf, n)
+                if t:
+                    bl = [{"tur": "ocr_sayfa", "dil": "tr", "ham": t, "metin": t, "top": 0, "x0": 0, "boyut": 0, "yazi": "tesseract-eng"}]
             bn = basili_no(bl)
             for i, b in enumerate(bl, 1):
                 base = {"sayfa": n, "basili_sayfa": bn, "sira": i, "tur": b["tur"], "dil": b["dil"]}
