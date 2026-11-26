@@ -12,3 +12,8 @@ Hiçbir birincil önsöz bu oturumda okunamadı (ağ kısıtı); hiçbir bilgi v
 
 ## Ağ izni gereken (bu oturumda erişilemedi)
 ekitap.yek.gov.tr ve esatis.yek.gov.tr (Konuk ve Miftâh önsözleri/PDF örnekleri), books.google.com, www.yenisafak.com (Lekesiz eleştirisi), www.kitapyurdu.com (403 bot engeli; izin yetmiyor), ktp.isam.org.tr. En değerli tek adres: Konuk 1. cilt PDF örneği (yek.gov.tr), ayrıca 2. cilt.
+
+## G-021 tur 2 (2026-11-26, kutuphaneci): TYEK önsözleri hâlâ okunamadı
+- ekitap.yek.gov.tr ve esatis.yek.gov.tr: ağ izni çalışıyor (CONNECT 200), ancak TLS doğrulaması başarısız: sunucu ara sertifikayı göndermiyor (yalnızca yaprak: CN=*.yek.gov.tr, düzenleyen GlobalSign GCC R46 AlphaSSL CA 2025; hata 21/"unable to get local issuer certificate"). Ara sertifika AIA adresi (secure.globalsign.com) proxy'de 403/çözülemiyor. Doğrulama kapatılmadı. İki deneme (30 sn arayla) aynı sonucu verdi; WebFetch ENOTFOUND.
+- Sonuç: Konuk 1./2. cilt ve Miftâh önsözü için birincil teyit YOK; yukarıdaki tablo değişmedi. PDF indirilmedi (veri/kasa/ altında yeni dosya yok).
+- Çözüm için gereken: secure.globalsign.com (veya ara sertifika dosyasının kendisi) ağ iznine eklenmeli ya da ara sertifika (gsgccr46alphasslca2025.crt) depoya/ortama elle konmalı.
