@@ -1,7 +1,8 @@
 # E-001 Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi
 
-- Kimlik/sürüm: E-001 v2 (2026-11-26, kutuphaneci, G-008). v1: G-001.
+- Kimlik/sürüm: E-001 v3 (2026-11-26, kutuphaneci, G-012: şerh-asıl bağı eklendi). v2: G-008. v1: G-001.
 - Eser: İbnü'l-Arabî, Fusûsu'l-hikem; Türkçe tercüme ve şerh: Ahmed Avni Konuk
+- Tür: ŞERH/çeviri. Asıl eser: Fusûsu'l-hikem Arapça ana metni = E-006 (`ust_eser_kimlik = E-006`). Bu kayıt yalnızca Konuk'un şerhini kapsar; ana metin tanıklıkları E-006'ya bağlanır (G-006 Ş2, G-012).
 - Müellif vefat: İbnü'l-Arabî 638/1240; Konuk 6 Mart 1938, İstanbul (TDV İA "Konuk, Ahmet Avni", DİA XXVI, s. 180-182; okundu 2026-11-26). Not: TDV doğum tarihi için üç farklı yıl veriyor (1285/1287/1288 h).
 - Şerhin telifi: Konuk büyük boy 28 defter olarak yazmış, "12-13 yıllık çalışmadan sonra 1928'de tamamlamış" (TDV İA, aynı madde). Yazma: Konya Mevlânâ Müzesi Ktp. nr. 3853-3880; İstanbul Atatürk Kitaplığı, Osman Ergin nr. 79/1-27.
 - Basılı neşir (BİRİNCİL İZ, TDV İA'dan): "Kitap, Konya Mevlânâ Müzesi'ndeki nüshası esas alınarak Mustafa Tahralı ve Selçuk Eraydın tarafından yeni harflere aktarılıp gerekli notlar, indeks ve lugatçeler ilâve edilerek dört cilt halinde İstanbul'da yayımlanmıştır (I, 1987, 1994, 1999; II, 1989, 1997; III, 1990; IV, 1992)." Bu cümle ansiklopedi maddesindendir (ikincil kaynak); neşrin kendi önsözünden teyit edilmedi.
