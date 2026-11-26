@@ -1,18 +1,16 @@
 ## Sizden beklenen
-1. Demirli Fusûs (Kabalcı) ve "Vahdet-i Vücûd ve Esasları" (Nusûs): iç kapak + önsöz fotoğrafı (dayanak baskı için).
-2. EVREN_URL (G-011).
+1. Sıradaki adım için onay (aşağıda "Öneri").
+2. Demirli Fusûs ve "Vahdet-i Vücûd ve Esasları": iç kapak + önsöz fotoğrafı. 3. EVREN_URL (G-011).
+4. İnsan inceleme kuyruğu: Fass-ı Âdemî'de 50 cümle çifti sizin (ya da bir uzmanın) bakmasını bekliyor.
 
 ## Hedef
 Konuk Fusûs şerhinden Arapça–Türkçe hizalanmış öğretici çiftler → sonra çeviri ve güven notu.
 
 ## Aşamalar
-1. Kaynak tespiti: BİTTİ (Konuk kendi tercihli metnini kurmuş; Arapça taraf neşrin içinde).
-2. Metin elde: BİTTİ (TYEK çeviri yazı 1. cilt, 892 s., kasada).
-3. Metin çıkarımı (G-022, Musahhih): BİTTİ. Tüm cilt çıkarıldı (13.485 blok; 4.498 Arapça, 3.670 tercüme, 3.821 şerh); 6 sayfada elle kontrol, hata görülmedi.
-4. Fass-ı Âdemî hizalaması (G-003): BİTTİ, denetimde. 24 pasaj, 201 cümle çifti; 20/20 elle doğru (tek okuyucu).
-5. Denetim (G-025): ŞARTLI KABUL. Arapça 7 sayfada hatasız, 36 çiftte 35 doğru 1 kısmi, eksik Fusûs cümlesi yok.
-   Şart: 4 pasajın Türkçesi çıkarımda bozuk (satır içi Arapçalı satırlar). Düzeltme: G-026 çıkarım BİTTİ (tüm cilt, 20 test) → G-027 Mukabeleci yeniden hizalama SÜRÜYOR → Mümeyyiz kısa kontrol.
-6. Sonra: ıstılah kararları → dönem sözlüğü kıyası → çeviri motoru.
+1. Kaynak tespiti: BİTTİ. 2. Metin elde: BİTTİ (Konuk 1. cilt). 3. Metin çıkarımı: BİTTİ (tüm cilt, düzeltilmiş).
+4–5. Fass-ı Âdemî hizalama + denetim: BİTTİ, KABUL. 199 cümle çifti, 147'si öğretici veri; 3 örneklemde anlam hatası 0.
+6. Sıradaki: ıstılah kararlarının çiftlerden çıkarılması (Istılahçı) ve dönem sözlüğü kıyası (Sözlükçü).
 
-## Yan işler
-- Şema v1 KABUL edildi (Mümeyyiz, gerileme yok). Kavram ağına ilk yazımdan önce küçük bir kontrol (K-2) kalacak. Test seti v2 (G-015): sırada.
+## Öneri
+Ya (a) aynı hattı 1. ciltteki diğer fasslara uygulamak (veri büyür, eşik kalibre olur),
+ya (b) önce Fass-ı Âdemî üzerinde 6. aşamayı denemek (ıstılah + sözlük kıyası). Reis'in önerisi: (a) 2 fass daha, sonra (b).
