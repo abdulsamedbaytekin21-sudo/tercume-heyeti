@@ -1,9 +1,11 @@
 ## Sizden beklenen
-1. Demirli Fusûs (Kabalcı) ve Demirli "Vahdet-i Vücûd ve Esasları" (Nusûs) önsöz sayfalarının fotoğrafı: dayandıkları Arapça baskı hiçbir açık kaynakta yazmıyor.
-2. Konuk Fusûs şerhinin dijital kopyası (G-003). 3. EVREN_URL (G-011).
+1. Demirli Fusûs (Kabalcı) ve Demirli "Vahdet-i Vücûd ve Esasları" (Nusûs) önsöz sayfaları: dayanakları hiçbir açık kaynakta yok.
+2. G-003 hizalamasını başlatma onayı (girdi artık elde). 3. EVREN_URL (G-011).
 
 ## Durum (26.11)
-- G-021 ilk tur (ikincil kaynaklar): Konuk'un Fusûs metni hazır bir neşir değil, kendi kurduğu metin; neşirciler Afîfî, el-Mansûb ve Kılıç–Alkış neşirleriyle karşılaştırmış, Konuk ayrıldığı yerlerde çoğunlukla Bosnevî'yi izliyor (teyit bekliyor).
-  Miftâh (TYEK 2014): karşı sayfadaki Arapça, Süleymaniye Ayasofya 1930 yazmasının tıpkıbasımı. Demirli Fusûs ve Nusûs: bulunamadı.
-- Sürüyor: G-021 ikinci tur, TYEK e-kitaplarından önsözlerin birincil teyidi (ağ izni eklendi).
-- Arapça taramalar ve OCR denemesi bitti (yan iş). Şema şartlı kabul; iki küçük düzeltme sırada.
+- Konuk: BİRİNCİL teyit (TYEK neşri önsözü s. XVII–XVIII). Konuk hazır bir neşir kullanmamış, kendi "tercihli metnini" kurmuş;
+  ayrıldığı yerlerde çoğunlukla Bosnevî'yi izliyor. Arapça taraf neşrin içindeki metin olacak (kararlar.md).
+- Miftâh: TYEK yayıncı kaydı, Süleymaniye Ayasofya 1930 nüshası esas alınmış (önsöz okunmadı).
+- Demirli Fusûs ve Nusûs: bulunamadı.
+- Konuk neşrinin 1. cildi (892 s.) TYEK'in açık e-kitabından alındı, kasada. G-003 (ilk fassın hizalanması) artık başlayabilir.
+- Şema şartlı kabul; iki küçük düzeltme sırada.
