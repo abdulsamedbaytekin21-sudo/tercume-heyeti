@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tercüme Heyeti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sakin, titiz, bir tercüme heyetinin çalışma masası
+   IDEA: el yazması sayfası; heyet bir defter, ayrıntı hâşiyede (kenar notu)
+   PICTURE: heyet defteri ve üyelerin Arapça harf mühürleri
+   COLOUR and TYPE: demir-mazı mürekkebi, kâğıt, yaldız cetvel; sürh yalnız dikkat için. Literata + Amiri
+   LAYOUT: üç sütun (heyet, rapor ve defter, hâşiye); telefonda tek sütun, alttan talimat şeridi */
+:root{
+  color-scheme:light dark;
+  --masa:light-dark(#D9DBD3,#12151B);
+  --sayfa:light-dark(#F7F7F3,#1B1F27);
+  --murekkep:light-dark(#1E2433,#E7E5DD);
+  --soluk:light-dark(#62665F,#A4A69E);
+  --cizgi:light-dark(#D2D3CB,#2D323C);
+  --cizgi-koyu:light-dark(var(--cizgi-koyu),rgba(231,229,221,.35));
+  --cetvel:light-dark(#A88B4A,#B99B5A);
+  --lacivert:light-dark(#2B4A7A,#93B3E6);
+  --surh:light-dark(#8E2F22,#E3907F);
+  --zumrut:light-dark(#3E6B57,#8BC4A6);
+  --vurgu:light-dark(#ECEDE6,#242934);
+  --alan:light-dark(var(--alan),#151920);
+  --alan-kenar:light-dark(var(--alan-kenar),#3A404B);
+  --latin:"Literata", Georgia, "Times New Roman", serif;
+  --arap:"Amiri", "Traditional Arabic", "Scheherazade New", serif;
+}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{overflow-x:clip;background:var(--masa);color:var(--murekkep);font-family:var(--latin);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;font-optical-sizing:auto}
+button,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lacivert);outline-offset:2px}
+
+/* Sayfa ve cetvel: bir el yazması sayfasının çift çizgili çerçevesi */
+.sayfa{max-width:1480px;margin:18px auto 0;background:var(--sayfa);padding:12px;
+  height:calc(100vh - 18px - var(--serit, 70px));box-shadow:0 1px 0 rgba(30,36,51,.06)}
+.cetvel{border:1px solid var(--cetvel);padding:3px;height:100%}
+.cetvel>.ic{border:1px solid var(--cizgi-koyu);height:100%;
+  display:grid;grid-template-columns:300px minmax(0,1fr) 360px;grid-template-rows:auto minmax(0,1fr)}
+.cetvel>.ic>section,.cetvel>.ic>aside{overflow:auto;scrollbar-width:thin}
+.rapor a,.hasiye a{color:var(--lacivert);text-decoration-thickness:1px;text-underline-offset:2px}
+
+header{grid-column:1/-1;display:flex;align-items:baseline;gap:28px;padding:20px 28px 16px;
+  border-bottom:1px solid var(--cizgi-koyu)}
+header h1{font-size:27px;font-weight:500;letter-spacing:.005em;margin:0}
+header .proje{color:var(--soluk);font-size:15px}
+header .tarih{margin-left:auto;text-align:right;color:var(--soluk);font-size:14px;line-height:1.4}
+header .tarih b{font-weight:500;color:var(--murekkep)}
+.baglanti{font-size:13px;color:var(--soluk)}
+.baglanti.koptu{color:var(--surh)}
+
+section{min-width:0}
+h2{font-size:17px;font-weight:600;margin:0 0 10px}
+.alt{color:var(--soluk);font-size:13.5px}
+
+/* Heyet defteri */
+.heyet{border-right:1px solid var(--cizgi);padding:18px 0 24px}
+.heyet h2{padding:0 22px}
+.uye{display:grid;grid-template-columns:52px 1fr;gap:0 12px;padding:11px 22px 12px 16px;cursor:pointer;
+  border-left:3px solid transparent;position:relative}
+.uye+.uye{border-top:1px solid var(--cizgi)}
+.uye:hover{background:var(--vurgu)}
+.uye[aria-selected="true"]{background:var(--vurgu);border-left-color:var(--murekkep)}
+.harf{font-family:var(--arap);font-size:34px;line-height:1;text-align:center;padding-top:2px;color:var(--soluk);
+  grid-row:1/4}
+.uye.calisiyor .harf{color:var(--lacivert)}
+.uye.bekliyor .harf{color:var(--surh)}
+.uye .ad{font-weight:600;font-size:15.5px;display:flex;gap:8px;align-items:baseline}
+.model{font-weight:400;font-size:12.5px;color:var(--soluk);font-style:italic}
+.uye .hal{font-size:13.5px}
+.hal .nokta{display:inline-block;width:7px;height:7px;border-radius:50%;background:#A9AAA3;margin-right:7px;
+  vertical-align:1px}
+.calisiyor .hal .nokta{background:var(--lacivert)}
+.bekliyor .hal .nokta{background:var(--surh)}
+.uye .su-an{font-size:13.5px;color:var(--soluk);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rozet{font-size:12px;color:var(--surh);font-weight:500}
+.ag-satir{margin:18px 22px 0;padding-top:12px;border-top:1px solid var(--cizgi);font-size:13.5px;color:var(--soluk)}
+.ag-satir b{color:var(--murekkep);font-weight:600}
+
+/* Üzerine gelince açılan hâşiye pusulası */
+.pusula{position:fixed;z-index:20;width:340px;background:var(--sayfa);border:1px solid var(--cizgi-koyu);
+  padding:14px 16px 12px;box-shadow:0 8px 28px rgba(30,36,51,.16);pointer-events:none;opacity:0;
+  transform:translateX(-4px);transition:opacity .12s ease, transform .12s ease}
+.pusula.acik{opacity:1;transform:none}
+.pusula .bas{display:flex;gap:10px;align-items:baseline;margin-bottom:6px}
+.pusula .bas .harf{font-size:24px;grid-row:auto;padding:0}
+.pusula .su{font-size:14.5px;margin:2px 0 8px}
+.adimlar{list-style:none;margin:0;padding:0;font-size:13px;color:var(--soluk)}
+.adimlar li{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:2px 0}
+.adimlar time{font-variant-numeric:tabular-nums}
+
+/* Orta sütun */
+.orta{padding:18px 30px 40px;display:flex;flex-direction:column;gap:30px}
+.rapor{max-width:72ch}
+.rapor h3{font-size:15px;font-weight:600;margin:16px 0 4px}
+.rapor h3:first-child{margin-top:0}
+.rapor p{margin:0 0 6px}
+.rapor ul{margin:0 0 6px;padding-left:20px}
+.rapor .beklenen{color:var(--surh)}
+.rapor .beklenen + p{border-left:2px solid var(--surh);padding-left:12px}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:500;color:var(--soluk);font-size:13px;padding:0 10px 6px 0;
+  border-bottom:1px solid var(--cizgi-koyu)}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--cizgi);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--vurgu)}
+tbody tr[aria-selected="true"] td{background:var(--vurgu)}
+td.no{font-variant-numeric:tabular-nums;color:var(--soluk);white-space:nowrap;width:58px}
+td.uye-h{white-space:nowrap}
+.durum-et{white-space:nowrap;font-size:13px}
+.d-calisiyor{color:var(--lacivert)} .d-bekliyor,.d-iade{color:var(--surh)} .d-tamam{color:var(--zumrut)}
+.d-sirada,.d-incelemede{color:var(--murekkep)} .d-devredildi{color:var(--cetvel)}
+tr.tamam td{color:var(--soluk)}
+.bos{color:var(--soluk);font-style:italic}
+
+/* Sağ sütun: hâşiye */
+.hasiye{border-left:1px solid var(--cizgi);padding:18px 24px 40px;display:flex;flex-direction:column;gap:26px}
+.kunye{display:flex;gap:14px;align-items:center}
+.kunye .harf{font-size:44px;padding:0;color:var(--murekkep)}
+.kunye .ad{font-size:19px;font-weight:600}
+.rol{font-size:14px;color:var(--soluk);margin:8px 0 0}
+.etiket{font-size:13px;color:var(--soluk);margin:0 0 4px}
+.kutu{font-size:14.5px}
+.talimat-liste{list-style:none;margin:0;padding:0;font-size:13.5px}
+.talimat-liste li{padding:6px 0;border-bottom:1px solid var(--cizgi)}
+.talimat-liste .ust{color:var(--soluk);font-size:12.5px}
+.talimat-liste .bekliyor .ust{color:var(--surh)}
+form.talimat textarea{width:100%;min-height:74px;resize:vertical;border:1px solid var(--alan-kenar);background:var(--alan);
+  padding:9px 10px;border-radius:2px;line-height:1.45}
+form.talimat textarea:focus{border-color:var(--murekkep);outline:none}
+.dugmeler{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.dugme{border:1px solid var(--murekkep);background:var(--murekkep);color:var(--sayfa);padding:6px 14px;
+  border-radius:2px;cursor:pointer;font-size:14px}
+.dugme.ikincil{background:transparent;color:var(--murekkep)}
+.dugme:disabled{opacity:.45;cursor:default}
+.bildirim{font-size:13px;color:var(--soluk)}
+.bildirim.hata{color:var(--surh)}
+.istem{font-size:13.5px;background:var(--vurgu);padding:10px 12px;border-left:2px solid var(--cetvel);margin-top:8px}
+.kart-govde{font-size:14px;max-height:46vh;overflow:auto;padding-right:6px}
+.kart-govde h3{font-size:14px;font-weight:600;margin:12px 0 2px}
+.kart-govde p,.kart-govde ul{margin:0 0 4px}
+.kart-govde ul{padding-left:18px}
+
+.ruzname ol{list-style:none;margin:0;padding:0;font-size:13px}
+.ruzname li{display:grid;grid-template-columns:42px 1fr;gap:8px;padding:3px 0;color:var(--soluk)}
+.ruzname li b{color:var(--murekkep);font-weight:500}
+.ruzname time{font-variant-numeric:tabular-nums}
+
+/* Reis'e talimat şeridi */
+.serit{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:1480px;background:var(--sayfa);
+  border-top:1px solid var(--cizgi-koyu);padding:12px 28px 14px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:16px;align-items:center;box-shadow:0 -6px 18px rgba(30,36,51,.06)}
+.serit label{font-weight:600;white-space:nowrap}
+.serit label .harf{font-size:24px;display:inline;padding:0 6px 0 0;color:var(--murekkep);vertical-align:-3px}
+.serit textarea{width:100%;height:44px;min-height:44px;resize:vertical;border:1px solid var(--alan-kenar);background:var(--alan);
+  padding:10px 12px;border-radius:2px}
+.serit textarea:focus{border-color:var(--murekkep);outline:none}
+.serit .sag{display:flex;gap:10px;align-items:center}
+
+@media (max-width:1180px){
+  .sayfa{height:auto;padding-bottom:12px}
+  .cetvel>.ic{grid-template-columns:260px minmax(0,1fr);height:auto}
+  .cetvel>.ic>section,.cetvel>.ic>aside{overflow:visible}
+  .hasiye{grid-column:1/-1;border-left:0;border-top:1px solid var(--cizgi)}
+  body{padding-bottom:var(--serit,70px)}
+}
+@media (max-width:760px){
+  .sayfa{margin:0;padding:6px}
+  .cetvel>.ic{grid-template-columns:1fr}
+  .heyet{border-right:0}
+  header{flex-wrap:wrap;padding:16px}
+  header .tarih{margin-left:0;text-align:left}
+  .orta{padding:18px 16px}
+  .serit{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  .serit label{display:none}
+  .serit .sag .bildirim{display:none}
+  .pusula{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.dugme{min-height:40px}
+.serit .not{font-size:13px;color:var(--soluk)}
+.uyari{margin:0 22px 12px;font-size:13.5px;color:var(--surh)}
+@media (max-width:760px){
+  .serit textarea{font-size:16px}
+  form.talimat textarea{font-size:16px}
+  .uye{padding:12px 16px 12px 10px}
+  table{font-size:13.5px}
+  td.uye-h,th:nth-child(4),td:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+<div class="sayfa"><div class="cetvel"><div class="ic">
+  <header>
+    <h1>Tercüme Heyeti</h1>
+    <span class="proje" id="proje"></span>
+    <div class="tarih"><b id="miladi"></b><br><span id="hicri"></span></div>
+    <span class="baglanti" id="baglanti" aria-live="polite">Bağlanıyor…</span>
+  </header>
+
+  <section class="heyet" aria-labelledby="h-heyet">
+    <h2 id="h-heyet">Heyet</h2>
+    <div id="uyeler" role="listbox" aria-label="Heyet üyeleri"></div>
+    <div class="ag-satir" id="ag"></div>
+  </section>
+
+  <section class="orta">
+    <div>
+      <h2>Reis'in raporu</h2>
+      <div class="rapor" id="rapor"></div>
+    </div>
+    <div>
+      <h2>Görev defteri</h2>
+      <table>
+        <thead><tr><th>No</th><th>İş</th><th>Üye</th><th>Model</th><th>Durum</th></tr></thead>
+        <tbody id="gorevler"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <aside class="hasiye" id="hasiye" aria-live="polite">
+    <div id="secili"></div>
+    <div class="ruzname">
+      <h2>Rûznâme</h2>
+      <ol id="ruzname"></ol>
+    </div>
+  </aside>
+</div></div></div>
+
+<form class="serit" id="reis-form">
+  <label for="reis-metin"><span class="harf">ر</span>Reis'e talimat</label>
+  <textarea id="reis-metin" placeholder="Reis’e talimat yazın"></textarea>
+  <div class="sag">
+    <span class="bildirim" id="reis-bildirim"></span>
+    <button type="submit" class="dugme">Gönder</button>
+  </div>
+</form>
+
+<div class="pusula" id="pusula" role="tooltip"></div>
+
+<script>{
+
+const HAL = {calisiyor:"Çalışıyor", bekliyor:"Sizi bekliyor", bosta:"Boşta"};
+const GDURUM = {sirada:"Sırada", calisiyor:"Yürütülüyor", bekliyor:"Bekliyor", incelemede:"İncelemede",
+  iade:"İade edildi", devredildi:"Antigravity'de", tamam:"Tamam"};
+const GSIRA = ["bekliyor","iade","calisiyor","incelemede","devredildi","sirada","tamam"];
+const MODEL = {opus:"Opus", sonnet:"Sonnet", haiku:"Haiku", fable:"Fable"};
+const OLAY = {talimat:"talimat bıraktı", "talimat-iletildi":"talimatı aldı", "gorev-yeni":"kart açtı",
+  "gorev-durum":"kartı güncelledi", teslim:"teslim etti", "teslim-alindi":"teslimi aldı", basladi:"işe başladı",
+  bitirdi:"bitirdi", bekliyor:"bekliyor", devir:"devretti", oturum:"oturum açtı", uyandirma:"Reis'i çalıştırdı"};
+
+let veri = null, secim = {tur:"uye", id:"reis"}, sonHata = 0;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const saat = iso => iso ? iso.slice(11,16) : "";
+function once(iso){
+  if(!iso) return "";
+  const dk = Math.round((Date.now() - new Date(iso).getTime())/60000);
+  if(dk < 1) return "az önce"; if(dk < 60) return dk + " dk önce";
+  const sa = Math.round(dk/60); if(sa < 24) return sa + " saat önce";
+  return Math.round(sa/24) + " gün önce";
+}
+function adi(id){
+  if(id==="kullanici") return "Siz"; if(id==="sistem") return "Sistem"; if(id==="antigravity") return "Antigravity";
+  const u = veri?.uyeler.find(x=>x.id===id); return u ? u.ad : id;
+}
+
+/* Küçük bir markdown çevirici: başlık, liste, kalın, satır içi kod, paragraf */
+function md(s){
+  const satir = esc(s).split(/\n/); let h = "", liste = false, par = [];
+  const bitirPar = () => { if(par.length){ h += "<p>"+par.join(" ")+"</p>"; par = []; } };
+  const bitirListe = () => { if(liste){ h += "</ul>"; liste = false; } };
+  const ic = t => t.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`(.+?)`/g,"<code>$1</code>");
+  for(const l of satir){
+    const m = l.match(/^#{1,4}\s+(.*)/);
+    if(m){ bitirPar(); bitirListe();
+      const bek = /sizden beklenen/i.test(m[1]);
+      h += `<h3${bek?' class="beklenen"':''}>${ic(m[1])}</h3>`; continue; }
+    const li = l.match(/^\s*[-*]\s+(.*)/);
+    if(li){ bitirPar(); if(!liste){ h += "<ul>"; liste = true; } h += "<li>"+ic(li[1])+"</li>"; continue; }
+    if(!l.trim()){ bitirPar(); bitirListe(); continue; }
+    bitirListe(); par.push(ic(l));
+  }
+  bitirPar(); bitirListe(); return h;
+}
+
+function cizUyeler(){
+  $("#uyeler").innerHTML = veri.uyeler.map(u => {
+    const d = u.durum, sec = secim.tur==="uye" && secim.id===u.id;
+    return `<div class="uye ${d.hal}" role="option" tabindex="0" data-id="${u.id}" aria-selected="${sec}">
+      <span class="harf" lang="ar" aria-hidden="true">${u.harf}</span>
+      <span class="ad">${esc(u.ad)} <span class="model">${MODEL[u.model]||u.model}</span></span>
+      <span class="hal"><span class="nokta"></span>${HAL[d.hal]||d.hal}${u.bekleyen?` <span class="rozet">· ${u.bekleyen} talimat bekliyor</span>`:""}</span>
+      <span class="su-an">${esc(d.su_an || (d.hal==="bosta" ? "Görev bekliyor" : ""))}</span>
+    </div>`;
+  }).join("");
+  const ag = veri.antigravity;
+  const agKart = veri.gorevler.filter(g => g.yurutucu==="antigravity" && g.durum!=="tamam");
+  $("#ag").innerHTML = agKart.length
+    ? `<b>Antigravity</b>: ${agKart.map(g=>esc(g.id)).join(", ")} — ${esc(ag.su_an||"")}`
+    : `<b>Antigravity</b>: devredilmiş görev yok`;
+}
+
+function cizRapor(){
+  $("#rapor").innerHTML = veri.rapor.trim() ? md(veri.rapor) : `<p class="bos">Reis henüz rapor yazmadı.</p>`;
+}
+
+function cizGorevler(){
+  const liste = [...veri.gorevler].sort((a,b)=> GSIRA.indexOf(a.durum)-GSIRA.indexOf(b.durum) || a.id.localeCompare(b.id));
+  $("#gorevler").innerHTML = liste.length ? liste.map(g => {
+    const sec = secim.tur==="gorev" && secim.id===g.id;
+    const kim = g.yurutucu==="antigravity" ? `Antigravity <span class="alt">(${esc(adi(g.atanan))})</span>` : esc(adi(g.atanan));
+    return `<tr class="${g.durum}" data-id="${g.id}" tabindex="0" aria-selected="${sec}">
+      <td class="no">${esc(g.id)}</td><td>${esc(g.baslik)}</td><td class="uye-h">${kim}</td>
+      <td class="alt">${MODEL[g.model]||esc(g.model||"")}</td>
+      <td><span class="durum-et d-${g.durum}">${GDURUM[g.durum]||g.durum}</span></td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="bos">Henüz görev kartı yok. Reis ilk planı yaptığında burada görünecek.</td></tr>`;
+}
+
+function cizRuzname(){
+  const r = [...veri.ruzname].reverse().slice(0,40);
+  $("#ruzname").innerHTML = r.length ? r.map(x =>
+    `<li><time datetime="${x.zaman}">${saat(x.zaman)}</time><span><b>${esc(adi(x.kim))}</b> ${OLAY[x.olay]||esc(x.olay)}${x.metin?": "+esc(x.metin):""}</span></li>`
+  ).join("") : `<li class="bos">Henüz kayıt yok.</li>`;
+}
+
+function adimlarHtml(d, n){
+  const a = [...(d.adimlar||[])].reverse().slice(0,n);
+  return a.length ? `<ul class="adimlar">${a.map(x=>`<li><time>${saat(x.zaman)}</time><span>${esc(x.ozet)}</span></li>`).join("")}</ul>`
+                  : `<p class="alt">Henüz kayıtlı adım yok.</p>`;
+}
+
+function cizSecili(){
+  const kutu = $("#secili");
+  if(secim.tur==="uye"){
+    const u = veri.uyeler.find(x=>x.id===secim.id); if(!u) return;
+    const d = u.durum, g = d.gorev ? veri.gorevler.find(x=>x.id===d.gorev) : null;
+    const tl = [...u.talimatlar].reverse();
+    const taslak = kutu.querySelector("textarea")?.value || "";
+    kutu.innerHTML = `
+      <div class="kunye"><span class="harf" lang="ar" aria-hidden="true">${u.harf}</span>
+        <div><div class="ad">${esc(u.ad)}</div><div class="alt">${MODEL[u.model]||u.model} · ${HAL[d.hal]||d.hal}${d.guncellendi?", "+once(d.guncellendi):""}</div></div></div>
+      <p class="rol">${esc(u.rol)}</p>
+      <div style="margin-top:18px"><p class="etiket">Şu an</p><div class="kutu">${esc(d.su_an || "Görev bekliyor")}</div>
+        ${g?`<p class="alt" style="margin:4px 0 0">Kart: <a href="#" data-gorev="${g.id}">${esc(g.id)} ${esc(g.baslik)}</a></p>`:""}</div>
+      <div style="margin-top:18px"><p class="etiket">Son adımlar</p>${adimlarHtml(d, 8)}</div>
+      <div style="margin-top:18px"><p class="etiket">${esc(u.ad)}'e talimat</p>
+        <form class="talimat" data-hedef="${u.id}">
+          <textarea aria-label="${esc(u.ad)} için talimat" placeholder="${u.ana?"Reis'e yazdığınız talimat bir sonraki adımında ona iletilir.":"Bu talimat "+esc(u.ad)+" bir sonraki adımında ona iletilir."}">${esc(taslak)}</textarea>
+          <div class="dugmeler"><button class="dugme" type="submit">Gönder</button><span class="bildirim"></span></div>
+        </form>
+        ${tl.length?`<ul class="talimat-liste" style="margin-top:10px">${tl.slice(0,6).map(t=>`<li class="${t.durum}"><div class="ust">${saat(t.zaman)} · ${esc(adi(t.kimden))} · ${t.durum==="bekliyor"?"iletilmeyi bekliyor":"iletildi"}</div>${esc(t.metin)}</li>`).join("")}</ul>`:""}
+      </div>`;
+  } else {
+    const g = veri.gorevler.find(x=>x.id===secim.id); if(!g) return;
+    const devredilebilir = g.yurutucu!=="antigravity" && g.durum!=="tamam";
+    const istem = kutu.dataset.istem && kutu.dataset.istemId===g.id ? kutu.dataset.istem : "";
+    kutu.innerHTML = `
+      <div><p class="etiket">${esc(g.id)} · ${GDURUM[g.durum]||g.durum}</p><div class="ad" style="font-size:18px;font-weight:600;line-height:1.35">${esc(g.baslik)}</div>
+      <p class="alt" style="margin:6px 0 0">${g.yurutucu==="antigravity"?"Antigravity yürütüyor":"Atanan: "+esc(adi(g.atanan))} · ${MODEL[g.model]||esc(g.model||"")}${g.guncellendi?" · "+once(g.guncellendi):""}</p></div>
+      <div class="kart-govde" style="margin-top:12px">${md(g.govde||"")}</div>
+      <div class="dugmeler">
+        ${devredilebilir?`<button class="dugme ikincil" id="devret" data-gorev="${g.id}">Antigravity'e devret</button>`:""}
+        <button class="dugme ikincil" type="button" data-uye="${g.atanan}">${esc(adi(g.atanan))}'i göster</button>
+        <span class="bildirim" id="devret-bildirim"></span></div>
+      ${istem?`<div class="istem"><p class="etiket" style="margin:0 0 4px">Antigravity'e yapıştırın</p><span id="istem-metin">${esc(istem)}</span>
+        <div class="dugmeler"><button class="dugme ikincil" type="button" id="kopyala">Kopyala</button></div></div>`:""}`;
+  }
+}
+
+function ciz(){ if(!veri) return;
+  $("#proje").textContent = veri.proje;
+  cizUyeler(); cizRapor(); cizGorevler(); cizRuzname();
+  const etkin = document.activeElement;
+  if(!(etkin && etkin.closest("#secili") && etkin.tagName==="TEXTAREA")) cizSecili();
+
+}
+
+const PROJE = "uuymkwriukkwfbxacdep";
+let mcp = null, sonVeri = 0;
+function coz(payload){
+  let t = payload;
+  if(t && typeof t === "object"){
+    if(Array.isArray(t)) return t;
+    t = t.result ?? t.text ?? t.content?.[0]?.text ?? JSON.stringify(t);
+  }
+  t = String(t);
+  const m = t.match(/<untrusted-data-[^>]+>\s*([\s\S]*?)\s*<\/untrusted-data-/);
+  return JSON.parse(m ? m[1] : t);
+}
+function satir(payload){ const r = coz(payload); return Array.isArray(r) ? r[0] : r; }
+function tazelik(){
+  const b = $("#baglanti");
+  if(!sonVeri){ return; }
+  const sn = Math.round((Date.now()-sonVeri)/1000);
+  b.classList.toggle("koptu", sn > 30);
+  b.textContent = sn > 30 ? "Son güncelleme " + once(new Date(sonVeri).toISOString()) : "";
+}
+async function sql(sorgu){
+  if(!mcp) throw new Error("Supabase bağlantısı yok.");
+  const r = await mcp.callTool("Supabase", "execute_sql", {project_id: PROJE, query: sorgu});
+  return satir(r.payload);
+}
+function dq(metin){ let e; do { e = "t" + Math.random().toString(36).slice(2,8); } while(metin.includes("$"+e+"$")); return "$"+e+"$"+metin+"$"+e+"$"; }
+async function baglan(){
+  try{ mcp = await claude.use("mcp"); }catch(e){ mcp = null; }
+  if(!mcp){
+    $("#baglanti").textContent = "Bu görünüm Supabase bağlantınıza erişemiyor. Sayfayı claude.ai'de ya da Claude uygulamasında açın ve bağlantı iznini verin.";
+    $("#baglanti").classList.add("koptu"); return;
+  }
+  mcp.watchTool("Supabase", "execute_sql", {project_id: PROJE, query: "select heyet.ozet() as o"}, ev => {
+    if(ev.type === "data"){
+      try{ veri = satir(ev.result.payload).o; sonVeri = Date.now(); ciz(); tazelik(); }
+      catch(e){ $("#baglanti").textContent = "Kayıt okunamadı: " + e.message; $("#baglanti").classList.add("koptu"); }
+    } else if(ev.type === "error"){
+      const b = $("#baglanti"); b.classList.add("koptu");
+      b.textContent = "Supabase'e ulaşılamadı" + (ev.error?.code ? " (" + ev.error.code + ")" : "") + ". Bağlantı iznini kontrol edin.";
+    }
+  }, {refetchInterval: 5000});
+}
+async function talimatGonder(hedef, metin){
+  if(!veri.uyeler.some(u => u.id === hedef)) throw new Error("Bilinmeyen üye");
+  await sql(`select heyet.talimat_ekle('${hedef}', ${dq(metin.trim())}, 'kullanici') as r`);
+}
+async function devret(id){
+  if(!/^G-\d{3,}$/.test(id)) throw new Error("Geçersiz görev");
+  const r = await sql(`select heyet.gorev_devret('${id}') as r`);
+  return r.r;
+}
+
+/* Tarih: miladî ve hicrî */
+function tarih(){
+  const d = new Date();
+  $("#miladi").textContent = d.toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric",weekday:"long"});
+  try{ $("#hicri").textContent = new Intl.DateTimeFormat("tr-TR-u-ca-islamic-umalqura",{day:"numeric",month:"long",year:"numeric"}).format(d); }catch(e){}
+}
+
+/* Etkileşim */
+const pusula = $("#pusula");
+document.addEventListener("mouseover", e => {
+  if(!matchMedia("(hover:hover)").matches) return;
+  const el = e.target.closest(".uye"); if(!el || !veri){ return; }
+  const u = veri.uyeler.find(x=>x.id===el.dataset.id); if(!u) return;
+  const d = u.durum, g = d.gorev ? veri.gorevler.find(x=>x.id===d.gorev) : null;
+  pusula.innerHTML = `<div class="bas"><span class="harf" lang="ar">${u.harf}</span><b>${esc(u.ad)}</b><span class="alt">${HAL[d.hal]||d.hal}${d.guncellendi?", "+once(d.guncellendi):""}</span></div>
+    <div class="su">${esc(d.su_an || "Görev bekliyor")}</div>
+    ${g?`<p class="alt" style="margin:0 0 8px">${esc(g.id)} ${esc(g.baslik)}</p>`:""}
+    ${adimlarHtml(d, 4)}`;
+  const r = el.getBoundingClientRect();
+  pusula.style.left = (r.right + 10) + "px";
+  const alt = innerHeight - $("#reis-form").offsetHeight - 12;
+  pusula.style.top = Math.max(12, Math.min(r.top, alt - pusula.offsetHeight)) + "px";
+  pusula.classList.add("acik");
+});
+document.addEventListener("mouseout", e => { if(e.target.closest(".uye") && !e.relatedTarget?.closest?.(".uye")) pusula.classList.remove("acik"); });
+
+function sec(tur, id){ secim = {tur, id}; if(veri) ciz();
+  if(matchMedia("(max-width:1180px)").matches) $("#hasiye").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth", block:"start"}); }
+document.addEventListener("click", async e => {
+  const uye = e.target.closest(".uye"); if(uye){ sec("uye", uye.dataset.id); return; }
+  const tr = e.target.closest("tbody tr[data-id]"); if(tr){ sec("gorev", tr.dataset.id); return; }
+  const gl = e.target.closest("[data-gorev]:not(#devret)"); if(gl){ e.preventDefault(); sec("gorev", gl.dataset.gorev); return; }
+  const ul = e.target.closest("[data-uye]"); if(ul){ sec("uye", ul.dataset.uye); return; }
+  if(e.target.id==="devret"){
+    const id = e.target.dataset.gorev, b = $("#devret-bildirim");
+    if(!confirmDevir(id)) return;
+    try{ const j = await devret(id); const k=$("#secili"); k.dataset.istem=j.istem; k.dataset.istemId=id; b.textContent="Devredildi."; }
+    catch(err){ b.textContent = err.message; b.classList.add("hata"); }
+  }
+  if(e.target.id==="kopyala"){
+    try{ await navigator.clipboard.writeText($("#istem-metin").textContent); e.target.textContent="Kopyalandı"; }catch(err){}
+  }
+});
+document.addEventListener("keydown", e => {
+  if(e.key==="Enter" && (e.target.matches(".uye") || e.target.matches("tbody tr[data-id]"))){ e.target.click(); }
+});
+/* Tarayıcı diyaloğu yerine sayfa içi onay: aynı düğmeye ikinci tıklama devreder */
+let devirOnay = null;
+function confirmDevir(id){
+  const b = $("#devret-bildirim");
+  if(devirOnay===id){ devirOnay=null; return true; }
+  devirOnay = id; b.classList.remove("hata");
+  b.textContent = "Kart Claude ekibinden alınıp Antigravity'e verilecek. Onaylamak için yeniden tıklayın.";
+  setTimeout(()=>{ if(devirOnay===id){ devirOnay=null; b.textContent=""; } }, 6000);
+  return false;
+}
+
+document.addEventListener("submit", async e => {
+  const f = e.target; e.preventDefault();
+  const reis = f.id==="reis-form";
+  const ta = reis ? $("#reis-metin") : f.querySelector("textarea");
+  const bil = reis ? $("#reis-bildirim") : f.querySelector(".bildirim");
+  const hedef = reis ? "reis" : f.dataset.hedef;
+  if(!ta.value.trim()){ bil.textContent = "Talimat boş."; bil.classList.add("hata"); return; }
+  try{
+    await talimatGonder(hedef, ta.value);
+    ta.value=""; bil.classList.remove("hata");
+    bil.textContent = hedef==="reis" ? "Reis'e iletilmek üzere kaydedildi." : adi(hedef)+"'e iletilmek üzere kaydedildi.";
+    if(reis){ const eski = ta.placeholder; ta.placeholder = "Kaydedildi. Reis bir sonraki adımında alacak."; setTimeout(()=>ta.placeholder=eski, 5000); }
+    ta.blur();
+  }catch(err){ bil.textContent = err.message; bil.classList.add("hata"); }
+});
+$("#reis-metin").addEventListener("keydown", e => { if(e.key==="Enter" && (e.metaKey||e.ctrlKey)) $("#reis-form").requestSubmit(); });
+
+function seritOlc(){ document.documentElement.style.setProperty("--serit", $("#reis-form").offsetHeight+"px"); }
+addEventListener("resize", seritOlc); seritOlc();
+tarih(); baglan(); setInterval(tarih, 60000); setInterval(tazelik, 10000);
+
+}</script>
+</body>
+</html>

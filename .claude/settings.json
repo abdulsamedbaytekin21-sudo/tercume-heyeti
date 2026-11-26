@@ -1,0 +1,34 @@
+{
+  "model": "opus",
+  "env": {
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 ekip/bin/ekip.py:*)",
+      "Read(ekip/**)",
+      "Edit(ekip/rapor.md)",
+      "Edit(proje/kararlar.md)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook session-start" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook user-prompt" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook post-tool" } ] }
+    ],
+    "SubagentStart": [
+      { "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook subagent-start" } ] }
+    ],
+    "SubagentStop": [
+      { "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook subagent-stop" } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "python3 \"${CLAUDE_PROJECT_DIR}/ekip/bin/ekip.py\" hook stop" } ] }
+    ]
+  }
+}

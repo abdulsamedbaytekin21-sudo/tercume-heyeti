@@ -1,0 +1,7 @@
+{
+  "aciklama": "Ortak kayıt Supabase'de. Yayımlanabilir anahtar gizli değildir; yazma yetkisi yalnızca HEYET_ANAHTAR ile verilir.",
+  "url": "https://uuymkwriukkwfbxacdep.supabase.co",
+  "yayimlanabilir_anahtar": "sb_publishable_uoDNjOPVRT5jbKZOMVbD7Q_szXwE7kL",
+  "anahtar_degiskeni": "HEYET_ANAHTAR",
+  "anahtar_dosyasi": ".heyet-anahtar"
+}

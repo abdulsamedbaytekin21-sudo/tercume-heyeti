@@ -1,0 +1,69 @@
+{
+  "proje": "Ekberî külliyat pilotu",
+  "uyeler": [
+    {
+      "id": "reis",
+      "ad": "Reis",
+      "harf": "ر",
+      "rol": "Heyetin yöneticisi. Planlar, görev dağıtır, teslimleri kabul eder, size rapor verir.",
+      "model": "opus",
+      "ana": true
+    },
+    {
+      "id": "kutuphaneci",
+      "ad": "Kütüphaneci",
+      "harf": "خ",
+      "rol": "Külliyat envanteri: eserler, baskılar, tahkikler, çeviriler, telif ve lisans kayıtları.",
+      "model": "sonnet"
+    },
+    {
+      "id": "musahhih",
+      "ad": "Musahhih",
+      "harf": "ص",
+      "rol": "Metin hazırlama: Arapça ve Türkçe OCR, tashih, normalleştirme, sayfa işaretleri.",
+      "model": "sonnet"
+    },
+    {
+      "id": "mukabeleci",
+      "ad": "Mukabeleci",
+      "harf": "ق",
+      "rol": "Arapça ile Türkçeyi pasaj, cümle ve öbek düzeyinde hizalar; hizalama güven puanını üretir.",
+      "model": "sonnet"
+    },
+    {
+      "id": "istilahci",
+      "ad": "Istılahçı",
+      "harf": "ط",
+      "rol": "Terim, anlam ve tanıklık kayıtları; kavram ağı; hizalamadan terim kararlarının çıkarılması.",
+      "model": "opus"
+    },
+    {
+      "id": "mimar",
+      "ad": "Mimar",
+      "harf": "م",
+      "rol": "PostgreSQL ve pgvector şeması, veri aktarım hatları, kalıcı kimlik ve sürümleme.",
+      "model": "sonnet"
+    },
+    {
+      "id": "tercuman",
+      "ad": "Tercüme Mühendisi",
+      "harf": "ت",
+      "rol": "Taslak çeviri motoru, örnek seçimi, S1–S6 güven notu ve kalibrasyon.",
+      "model": "sonnet"
+    },
+    {
+      "id": "mumeyyiz",
+      "ad": "Mümeyyiz",
+      "harf": "ز",
+      "rol": "Bağımsız denetçi: ölçütler, kâhin simülasyonu, sızıntı kontrolü, teslimlerin kabul denetimi.",
+      "model": "opus"
+    },
+    {
+      "id": "katip",
+      "ad": "Kâtip",
+      "harf": "ك",
+      "rol": "Mekanik işler: dosya düzeni, toplu dönüştürme, özet ve kayıt tutma.",
+      "model": "haiku"
+    }
+  ]
+}

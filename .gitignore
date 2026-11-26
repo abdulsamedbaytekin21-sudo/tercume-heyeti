@@ -1,0 +1,18 @@
+# Erişim anahtarı: asla depoya girmez
+.heyet-anahtar
+.env
+
+# Yerel çalışma kayıtları (ortak kayıt Supabase'de)
+ekip/durum/
+ekip/talimat/
+ekip/antigravity/
+ekip/gunluk/
+ekip/ruzname.jsonl
+
+# Telifli veri kasası
+veri/kasa/
+
+__pycache__/
+*.pyc
+.DS_Store
+_yedek/
