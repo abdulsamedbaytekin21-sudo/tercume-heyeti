@@ -55,7 +55,7 @@ açık modellere yaptırılır; Claude üyeleri işi kurar, örnekleyerek kontro
 - **Claude'da kalır:** ıstılah ve anlam kararları, kavram ağına ve altın standarda yazılan her şey,
   Mümeyyiz denetimi, şema ve mimari kararlar.
 - **Asla gönderilmez:** `veri/kasa/` altındaki telifli veri (araç zaten reddeder).
-- Hangi işin EVREN'e geçeceğine G-008 ölçüm kartının sonucu karar verir. Sonuç gelene kadar yalnızca
+- Hangi işin EVREN'e geçeceğine G-011 ölçüm kartının sonucu karar verir. Sonuç gelene kadar yalnızca
   ölçüm için kullan. Sonuçları `proje/kararlar.md`'ye yaz.
 - EVREN ayarı yoksa (araç "ayar eksik" der) işi Claude ile yap ve rapora tek satır yaz.
 - Kota tasarrufu: büyük okuma ve toplu işlerde üyeye önce EVREN ile denemesini, sonra örneklem kontrolünü söyle.
