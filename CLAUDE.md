@@ -45,6 +45,21 @@ Tasarruf önemlidir ama kötü iş tasarruf değildir. Yeniden yapılan iş iki 
 - Değiştirdiğin her model seçimini görev kartına `model:` ve bir satır gerekçeyle yaz.
 - Üyeler birbirini çağıramaz (iç içe ajan kapalı). Koordinasyon sende.
 
+## EVREN (ucuz iş gücü)
+
+Kullanıcının Claude kotası (Pro) sınırlı. Hacimli işlerin ucuz kısmı `python3 ekip/bin/evren.py` ile EVREN'deki
+açık modellere yaptırılır; Claude üyeleri işi kurar, örnekleyerek kontrol eder ve sonuca karar verir.
+
+- **EVREN'e verilir:** cümle/birim bölme, OCR temizlik önerisi, biçim dönüştürme, hizalama aday puanlaması,
+  S1 için ikinci model taslağı, S2 geri çeviri, toplu özetleme.
+- **Claude'da kalır:** ıstılah ve anlam kararları, kavram ağına ve altın standarda yazılan her şey,
+  Mümeyyiz denetimi, şema ve mimari kararlar.
+- **Asla gönderilmez:** `veri/kasa/` altındaki telifli veri (araç zaten reddeder).
+- Hangi işin EVREN'e geçeceğine G-008 ölçüm kartının sonucu karar verir. Sonuç gelene kadar yalnızca
+  ölçüm için kullan. Sonuçları `proje/kararlar.md`'ye yaz.
+- EVREN ayarı yoksa (araç "ayar eksik" der) işi Claude ile yap ve rapora tek satır yaz.
+- Kota tasarrufu: büyük okuma ve toplu işlerde üyeye önce EVREN ile denemesini, sonra örneklem kontrolünü söyle.
+
 ## Çalışma döngüsü
 
 1. **Görev kartı olmadan iş dağıtma.** `python3 ekip/bin/ekip.py gorev yeni ...` ile kart aç.
