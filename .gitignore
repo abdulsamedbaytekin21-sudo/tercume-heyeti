@@ -17,3 +17,9 @@ __pycache__/
 .DS_Store
 _yedek/
 .evren-anahtar
+
+# Ham taramalar büyük; depoda yalnızca künye ve sağlama toplamı tutulur
+veri/ham/**/*.pdf
+veri/ham/**/*.djvu
+veri/ham/**/*.jp2
+veri/ham/**/*.zip

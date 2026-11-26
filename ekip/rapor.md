@@ -6,8 +6,9 @@
 3. EVREN_URL ve EVREN_ANAHTAR ortam değişkenleri (G-011 bunu bekliyor).
 
 ## Durum (26.11)
-- Yarıda kalan iki iş bitti: G-014 test setinin Arapça gözden geçirmesi (şartlı kullanılabilir; 4 anlam hatası, 6 etiket düzeltmesi) ve G-002 şema düzeltmeleri (3 engelleyici ve 4 önemli bulgu giderildi).
-- G-002 kabulü için kalan: kasada Arapça birim tablosu (küçük ek, Mimar) + Mümeyyiz'in kısa yeniden denetimi. Onayınızı bekliyor.
-- Açılıp başlatılmayan: G-015 test seti v2 düzeltmeleri (Mümeyyiz, Sonnet).
-- Bekliyor: G-003 (Konuk şerhi kopyası), G-011 (EVREN ayarı). Sözlükçü heyette, görevsiz.
-- Yeni kararlar kararlar.md'de: şerh–asıl bağı tek sütunda; telifli Arapça baskı kasada (geçici).
+- Eser yükleme başladı (telifsiz kaynaklar). Ortama archive.org ağ izni eklendi.
+- Sürüyor: G-016 Kütüphaneci eski Arapça Fusûs baskıları ve klasik sözlük taramalarını arıyor/indiriyor;
+  G-017 Sözlükçü pilot eserlere uygun dönem sözlüklerini ve başvuru sırasını kuruyor;
+  G-019 Mimar kasaya Arapça birim tablosu ekliyor (ardından Mümeyyiz G-002 son denetimi).
+- Sırada: G-018 Musahhih OCR denemesi (indirme bitince), G-015 test seti v2.
+- Türkçe çeviriler (telifli) sizin tarama/PDF'inizi bekliyor. Bekliyor: G-003, G-011 (EVREN_URL eksik).
