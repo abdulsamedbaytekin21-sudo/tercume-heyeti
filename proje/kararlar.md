@@ -12,3 +12,10 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 - **Sızıntı:** Test edilen eserin çiftleri hafızada bulunmaz. En az bir az bilinen metin, model ezberini ölçmek için korpusta olacak.
 - **Telif:** Yayımlanmış çeviriler ilk "kurum kasası" gibi izole tutulacak. Ticari kullanım ve eğitim için hukukçu görüşü alınacak. Yayınevleriyle hizmet karşılığı veri lisansı yolu araştırılacak.
 - **Ekip düzeni:** Reis her zaman Opus. Üyeler işin zorluğuna göre Opus/Sonnet/Haiku. Kritik teslimler Mümeyyiz denetiminden geçer.
+
+## 2026-11-26 (G-002 / G-009 denetimi sonrası)
+- **Eser bazında dışarıda bırakma şerhleri de kapsar:** Test edilen eser bir şerhin asıl metniyse (ör. Fusûs), o şerhin (ör. Konuk) çiftleri de hafızadan çıkarılır. Gerekçe: şerh asıl metni içerir; sızıntı olur. Dışlama elle girilen bir sütuna değil, birimden türetilen eser bağına dayanmalı.
+- **Türkçe metin omurgaya hiçbir yoldan giremez:** Engel baskı türüne (`ceviri`) değil, dil ve lisansa bağlanır; şerh ve neşir baskılarındaki Türkçe metin de kasadadır.
+- **Kurum seçimi (pilot):** Pilotta tek kurum var; korunan sınır omurga–kasa ayrımıdır ve rollerle tutulur. `heyet.kurum` oturum ayarı pilotta kalabilir. İkinci kurum eklenmeden önce kurum başına rol ve `current_user` eşlemesi zorunludur.
+- **Terim kararları kasada durur:** Türkçe karşılık çeviriden türediği için. Omurgaya serbest karşılık gerekirse ayrı arındırma göçü ve hukukçu görüşü gerekir.
+- **Kota (T-0009):** Kullanıcının Claude kotası Pro. Opus yalnızca Mümeyyiz denetimi ve ıstılah/anlam kararlarında; EVREN ölçümü (G-011) sonuçlanınca ucuz işler oraya taşınır.
