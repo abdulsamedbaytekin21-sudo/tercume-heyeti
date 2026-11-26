@@ -11,6 +11,6 @@
 - Bitti: G-001/004/007/008; G-005 gömme test seti ve G-006 ıstılah seti şartlı kabul.
 - G-002 şema denetimden döndü (3 engelleyici: Türkçe metnin omurgaya sızması, test eseri dışlamanın
   denetimsiz olması, kurumlar arası FK). Mimar düzeltiyor; sonra Mümeyyiz yeniden denetleyecek.
-- Sürüyor: G-002 düzeltme (Mimar), G-014 test seti gözden geçirme (Istılahçı).
+- Durduruldu (kullanıcı talimatı): G-002 düzeltme (Mimar) ve G-014 test seti gözden geçirme (Istılahçı). Yarım işler ara kayıt olarak depoda; kartlar "sırada".
 - G-012, G-013 bitti (kavram seti v2, hepsi taslak). Fusûs ana metni ayrı eser (E-006). Bekliyor: G-003 (kopya), G-011 (EVREN ayarı).
 - Yeni kararlar proje/kararlar.md'de (şerh dışlaması, anlam ekol taşımaz, kayıtlar taslak girer).
