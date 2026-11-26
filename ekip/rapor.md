@@ -1,11 +1,16 @@
 ## Sizden beklenen
-1. Demirli Fusûs (Kabalcı) ve Demirli "Vahdet-i Vücûd ve Esasları" (Nusûs) önsöz sayfaları: dayanakları hiçbir açık kaynakta yok.
-2. G-003 hizalamasını başlatma onayı (girdi artık elde). 3. EVREN_URL (G-011).
+1. Demirli Fusûs (Kabalcı) ve "Vahdet-i Vücûd ve Esasları" (Nusûs): iç kapak + önsöz fotoğrafı (dayanak baskı için).
+2. EVREN_URL (G-011).
 
-## Durum (26.11)
-- Konuk: BİRİNCİL teyit (TYEK neşri önsözü s. XVII–XVIII). Konuk hazır bir neşir kullanmamış, kendi "tercihli metnini" kurmuş;
-  ayrıldığı yerlerde çoğunlukla Bosnevî'yi izliyor. Arapça taraf neşrin içindeki metin olacak (kararlar.md).
-- Miftâh: TYEK yayıncı kaydı, Süleymaniye Ayasofya 1930 nüshası esas alınmış (önsöz okunmadı).
-- Demirli Fusûs ve Nusûs: bulunamadı.
-- Konuk neşrinin 1. cildi (892 s.) TYEK'in açık e-kitabından alındı, kasada. G-003 (ilk fassın hizalanması) artık başlayabilir.
-- Şema şartlı kabul; iki küçük düzeltme sırada.
+## Hedef
+Konuk Fusûs şerhinden Arapça–Türkçe hizalanmış öğretici çiftler → sonra çeviri ve güven notu.
+
+## Aşamalar
+1. Kaynak tespiti: BİTTİ (Konuk kendi tercihli metnini kurmuş; Arapça taraf neşrin içinde).
+2. Metin elde: BİTTİ (TYEK çeviri yazı 1. cilt, 892 s., kasada).
+3. Metin çıkarımı (G-022, Musahhih): SÜRÜYOR. PDF'teki Arapça ters sıra ve bozuk harfle çıkıyor; düzeltiliyor.
+4. İlk fassın hizalanması (G-003, Mukabeleci): 3 bitince.
+5. Denetim (Mümeyyiz) → ıstılah kararları → dönem sözlüğü kıyası → çeviri motoru.
+
+## Yan işler
+- Şema son düzeltmesi (G-023, Mimar): sürüyor. Test seti v2 (G-015): sırada.
