@@ -15,7 +15,7 @@ Yapılandırılmış katman (PostgreSQL, hakikat kaynağı) ve vektör katmanı 
 **omurga** (ortak, telifsiz Arapça veri ve kavram ağı)
 - `donem`, `ekol`: kendi üst kaydına bağlı; `dis_kimlik` (ör. `ekol:ekberi`).
 - `eser` → `baski` → `metin_birimi`. **Asıl metin ve şerh ayrı eserdir**; şerh→asıl bağı `eser.ust_eser_kimlik` (FK, döngü denetimli). `serh_eder` ilişki kenarı eserler arasında açılırsa bu bağla çelişemez (tetikleyici reddeder).
-- `baski`: `tur` (nesir/serh/ceviri), `dil`, `lisans_sinifi`, ham dosya sha256. Üretilmiş `omurga_uygun` (= dil `ar` ve tür `ceviri` değil ve lisans `telifli` değil), `kasa_uygun` (= dil `ar` değil) ve `kasa_arapca_uygun` (= dil `ar` ve tür `ceviri` ya da lisans `telifli`) sütunları metnin nereye girebileceğini belirler; her baskı bu üç kümeden en çok birine düşer (`omurga_uygun` ve `kasa_arapca_uygun` ayrıktır).
+- `baski`: `tur` (nesir/serh/ceviri), `dil`, `lisans_sinifi`, ham dosya sha256. Üretilmiş `omurga_uygun` (= dil `ar` ve tür `ceviri` değil ve lisans yalnız `serbest`; `bilinmiyor` omurgaya girmez), `kasa_uygun` (= dil `ar` değil) ve `kasa_arapca_uygun` (= dil `ar` ve tür `ceviri` ya da lisans `serbest` değil) sütunları metnin nereye girebileceğini belirler; her baskı bu üç kümeden en çok birine düşer (`omurga_uygun` ve `kasa_arapca_uygun` ayrıktır).
 - `metin_birimi`: yalnız `omurga_uygun` baskıya bağlanır. `kok_dizisi`, `lemma_dizisi` `text[]` (GIN dizinli); `metin_normal` pg_trgm dizinli.
 - `terim` (kök `text[]`) → `anlam` → `taniklik`. Anlam ekol/dönem taşımaz; ekol, dönem, müellif tanıklıkta durur.
 - `iliski`: türlendirilmiş kenar; uçları `varlik_kayit` üzerinden herhangi bir omurga varlığına bağlanır; tür `iliski_turu` tablosundan (`ilgili`, `sarih_yorumu`, `yerine_gecen` dahil).
@@ -29,11 +29,11 @@ Yapılandırılmış katman (PostgreSQL, hakikat kaynağı) ve vektör katmanı 
 | `kimlik` (IST-...) | `dis_kimlik text UNIQUE` (kalıcı uuid `kimlik` ayrıdır; ayrıca `eser`, `baski`, `ekol`, `donem`) |
 | `guven` yuksek/orta/dusuk, `gerekce`, `inceleme` | aynı adlı sütunlar (`terim` hariç); `dusuk` ise `gerekce` zorunlu ve `inceleme` insan/yapildi |
 | `durum` taslak/onayli/geri_cekildi | `durum` CHECK; `geri_cekildi` gerekçe ister. `anlam`/`iliski` `onayli` olmak için baskıdan okunmuş **onaylı tanıklık** ister (tetikleyici); tanıklık `onayli` olmak için `metin_birimi_kimlik` ve `konum_dogrulama='dogrulandi'` ister |
-| `degisiklik {kart, ozet, onceki, tarih, yapan}` | `degisiklik jsonb` (`kart` ve `ozet` anahtarları zorunlu, diğerleri serbest). Güncelleme, önceki değerden **farklı** bir `degisiklik` taşımak zorundadır; eski sürüm (kendi `degisiklik`'iyle) `surum_gecmisi.eski` içine gider, yani "neyi hangi kartla değiştirdik" geçmişte sürüm sürüm okunur |
+| `degisiklik {kart, ozet, onceki, tarih, yapan}` | `degisiklik jsonb` (`kart` ve `ozet` anahtarları zorunlu, diğerleri serbest). Güncelleme, önceki değerden **farklı** ve NULL olmayan bir `degisiklik` taşımak zorundadır (INSERT'te NULL kalabilir); eski sürüm (kendi `degisiklik`'iyle) `surum_gecmisi.eski` içine gider, yani "neyi hangi kartla değiştirdik" geçmişte sürüm sürüm okunur |
 | `cilt`, `sayfa` "doğrulanmadı" | `cilt`/`sayfa` NULL; `konum_dogrulama` dogrulanmadi/dogrulandi (dolu değer ancak `dogrulandi` ile) |
 | `kok[]` | `text[]` |
 
-Her tabloda `kimlik uuid` (PK, değişmez) ve `surum` (her UPDATE'te +1, elle yazılan değer yok sayılır). Eski satır `surum_gecmisi`'ne jsonb yazılır (omurga ve kasa ayrı). Silinen kimlik yeniden kullanılamaz (geçmişte varsa INSERT reddedilir; kasada denetim kurum görünürlüğü içindedir).
+Her tabloda `kimlik uuid` (PK, değişmez) ve `surum` (her UPDATE'te +1, elle yazılan değer yok sayılır). Eski satır `surum_gecmisi`'ne jsonb yazılır (omurga ve kasa ayrı). Silinen kimlik yeniden kullanılamaz (geçmişte varsa INSERT reddedilir; denetim tüm kurumlar için geçerlidir).
 
 ## İzolasyon
 - Kasa tablolarının hepsi `ENABLE + FORCE ROW LEVEL SECURITY`; politika `kurum_kimlik = kasa.gecerli_kurum()` (oturum ayarı `heyet.kurum`). Ayar yoksa hiçbir satır görünmez/yazılmaz.
@@ -64,7 +64,9 @@ Planlayıcı dizini **ancak** sorguda aynı `gomme::vector(1024)` ifadesi ve ayn
 - `omurga.anlam.tanim` ve `taniklik.alinti` serbest metindir; kasadaki `terim_karari.karsilik_tr` (çeviriden türeyen) buraya elle kopyalanamaz diye teknik engel yoktur. Girişi kural/inceleme sınırlar (`inceleme`, `durum`); omurgaya "serbest karşılık" yolu ayrı arındırma göçü ve hukukçu görüşü ister.
 - **Telifli Arapça baskı (G-019, Reis kararı; hukukçu görüşüne kadar geçici):** metni omurgaya girmez, `kasa.arapca_birim`'e girer. Hukukçu klasik metnin tahkikten ayrılabileceğini söylerse karar gözden geçirilir (baskı lisansı yeniden sınıflandırılınca birimlerin kasadan omurgaya taşınması ayrı göç işidir). `kasa.arapca_birim.metin`/`metin_normal` telifli içeriktir; omurgadaki serbest metin alanlarına kopyalanmasını engelleyen teknik bir bağ yoktur; kural/inceleme sınırlar.
 - Onay kuralı onay anında denetlenir; onaylı tanıklık sonradan geri çekilirse bağlı onaylı anlam otomatik düşmez (inceleme işidir).
-- Kimlik yeniden kullanım denetimi kasada yalnız çağıran kurumun görünürlüğü içindedir (uuid çakışması ayrıca birincil anahtarla engellenir).
+- Kimlik yeniden kullanım denetimi kasada küresel çalışır (definer işlev RLS'yi atlar): bir kurum başka kurumun silinmiş kimliğini de kullanamaz. Bu daha güvenli yöndür; uuid çakışması ayrıca birincil anahtarla engellenir.
+- `kasa.cift_uye` tetikleyicisi `kurum_kimlik`'in oturum kurumuna eşit olmasını ister (varlık kâhini kapalı). Bağlı çift üyesi olan eserin (ya da şerh alt ağacının) `ust_eser_kimlik` değeri değiştirilemez; çözmek için önce çift üyeleri kaldırılmalıdır.
+- Lisansı `bilinmiyor` Arapça baskı kasaya (`kasa.arapca_birim`) gider; lisans `serbest` olarak yeniden sınıflandırılınca kasadan omurgaya taşıma ayrı göç işidir.
 
 ## Denetim bulgularının yeniden denemesi (G-009 ve G-010 şema eşlemesi)
 Geçici PG 16.15 + pgvector 0.6.0 kümesi (`/var/tmp/g002_pg`, yalnız soket, iş bitince silindi), boş veritabanında `000` + `001`, ardından denemeler (`u_om` omurga yazar, `u_ka` kasa yazar, `u_ok` kasa okur). Sonuçlar:
@@ -115,3 +117,15 @@ Geçici PG 16 kümesi (`/var/tmp/g019_pg`, yalnız soket, iş bitince silindi), 
 | B kurumu: A'nın birimine çift üyesi, `ust_birim`, vektör; A adına yazma | Hepsi reddedildi (FK/RLS); B'nin A birimini görmesi 0 satır |
 | Kurum ayarsız; okur rolü yazma; omurga rolü | 0 satır; `permission denied`; `permission denied for schema kasa` |
 | `kimlik` değiştirme; silinen kimlikle yeniden ekleme | Reddedildi |
+
+## G-023 denemeleri (G-020 şartları Y1, Y2 ve küçük bulgular)
+Geçici PG 16 kümesi (`/var/tmp/g023_pg`, yalnız soket, iş bitince silindi), `000` + `001`; up, down, up temiz.
+| Bulgu | Deneme | Sonuç |
+|---|---|---|
+| Y1 | Baskı bayrakları: `nesir/ar/serbest`, `nesir/ar/bilinmiyor` (varsayılan), `serh/tr/telifli` | `omurga_uygun` t/f/f; `kasa_arapca_uygun` f/t/f |
+| Y1 | `bilinmiyor` Arapça baskıya `omurga.metin_birimi`; `kasa.arapca_birim` | Omurga reddedildi (lisans=bilinmiyor mesajı); kasa kabul |
+| Y1 | `serbest` Arapça baskıya `omurga.metin_birimi`; `kasa.arapca_birim` | Omurga kabul; kasa reddedildi |
+| Y2 | `degisiklik=NULL` ile güncelleme; değişmeyen bildirim; yeni bildirim; NULL girilmiş kayda bildirimli güncelleme | Reddedildi / reddedildi / kabul (sürüm 2) / kabul |
+| K-1 | A oturumu `kurum_kimlik=B` ile çift üyesi (B'nin var olan birimi ve var olmayan birim) | İkisi de aynı hata (`kurum kimligi oturumun kurumuyla uyusmuyor`) |
+| K-3 | Bağlı çift yokken `ust_eser_kimlik` değişimi; çift varken NULL / başka eser / ata eserin üstü; `ust_eser_kimlik` değişmeyen güncelleme; ilgisiz eser | Kabul; 3/3 reddedildi; kabul; kabul. Omurga yazarı tetikleyiciyi tetikler (definer), işlevi doğrudan çağıramaz |
+| K-4 | README kimlik denetimi cümlesi | Küresel davranışa göre düzeltildi |

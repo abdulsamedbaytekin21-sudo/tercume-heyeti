@@ -44,7 +44,7 @@ BEGIN
     IF NEW.kimlik IS DISTINCT FROM OLD.kimlik THEN
       RAISE EXCEPTION 'kimlik degistirilemez (%.%)', TG_TABLE_SCHEMA, TG_TABLE_NAME;
     END IF;
-    IF to_jsonb(NEW) ? 'degisiklik' AND (to_jsonb(NEW)->'degisiklik') IS NOT DISTINCT FROM (to_jsonb(OLD)->'degisiklik') THEN
+    IF to_jsonb(NEW) ? 'degisiklik' AND (jsonb_typeof(to_jsonb(NEW)->'degisiklik') = 'null' OR (to_jsonb(NEW)->'degisiklik') IS NOT DISTINCT FROM (to_jsonb(OLD)->'degisiklik')) THEN
       RAISE EXCEPTION 'guncelleme yeni bir degisiklik (kart, ozet) bildirimi tasimali (%.%)', TG_TABLE_SCHEMA, TG_TABLE_NAME;
     END IF;
     NEW.surum := OLD.surum + 1;
@@ -198,10 +198,10 @@ CREATE TABLE omurga.baski (
   not_ text,
   -- Metnin nereye girebileceği DİL ve LİSANSA bağlıdır (tür ne olursa olsun). Üretilmiş sütunlar, aşağıdaki
   -- bileşik FK'lerle birimlere bağlanır: baskı sonradan değişip uygunluğu bozarsa, bağlı birim varken reddedilir.
-  omurga_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND tur <> 'ceviri' AND lisans_sinifi <> 'telifli') STORED,
+  omurga_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND tur <> 'ceviri' AND lisans_sinifi = 'serbest') STORED,
   kasa_uygun boolean GENERATED ALWAYS AS (dil <> 'ar') STORED,
-  -- Omurgaya girmeyen Arapça baskı (telifli tahkik, Arapçaya çeviri) kasada kasa.arapca_birim'e girer.
-  kasa_arapca_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND (tur = 'ceviri' OR lisans_sinifi = 'telifli')) STORED,
+  -- Omurgaya girmeyen Arapça baskı (telifli ya da lisansı bilinmeyen tahkik, Arapçaya çeviri) kasada kasa.arapca_birim'e girer.
+  kasa_arapca_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND (tur = 'ceviri' OR lisans_sinifi <> 'serbest')) STORED,
   UNIQUE (kimlik, eser_kimlik),
   UNIQUE (kimlik, eser_kimlik, omurga_uygun),
   UNIQUE (kimlik, eser_kimlik, kasa_uygun),
@@ -642,6 +642,9 @@ CREATE INDEX ON kasa.cift_uye(eser_kimlik);
 CREATE FUNCTION kasa.cift_uye_doldur() RETURNS trigger LANGUAGE plpgsql
   SECURITY DEFINER SET search_path = pg_catalog, public AS $$
 BEGIN
+  IF NEW.kurum_kimlik IS DISTINCT FROM kasa.gecerli_kurum() THEN   -- definer RLS'yi atlar: başka kurum için varlık kâhini olmasın
+    RAISE EXCEPTION 'kurum kimligi oturumun kurumuyla uyusmuyor';
+  END IF;
   IF NEW.taraf = 'ar' AND NEW.kasa_arapca_birim_kimlik IS NOT NULL THEN   -- RLS: yalnız kendi kurumunun birimi görünür
     SELECT eser_kimlik INTO NEW.eser_kimlik FROM kasa.arapca_birim
       WHERE kimlik = NEW.kasa_arapca_birim_kimlik AND kurum_kimlik = NEW.kurum_kimlik;
@@ -757,10 +760,28 @@ END $$;
 CREATE TRIGGER kurum_surum BEFORE UPDATE OR DELETE ON kasa.kurum FOR EACH ROW EXECUTE FUNCTION kasa.kurum_surum();
 CREATE TRIGGER kurum_kimlik_tekrar BEFORE INSERT ON kasa.kurum FOR EACH ROW EXECUTE FUNCTION omurga.kimlik_tekrar_yasak();
 
+-- Bağlı çifti olan eserin (ya da şerh alt ağacının) ust_eser_kimlik'i değişemez: çift değişmezi (aynı ağaç) ve
+-- eser bazında dışarıda bırakma bozulmasın. Tüm kurumların çiftlerine bakmak için definer (RLS'yi atlar), yalnız var/yok döner.
+CREATE FUNCTION omurga.eser_ust_degisim_denetle() RETURNS trigger LANGUAGE plpgsql
+  SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+BEGIN
+  IF NEW.ust_eser_kimlik IS DISTINCT FROM OLD.ust_eser_kimlik AND EXISTS (
+    WITH RECURSIVE alt AS (
+      SELECT OLD.kimlik AS kimlik
+      UNION
+      SELECT e.kimlik FROM omurga.eser e JOIN alt a ON e.ust_eser_kimlik = a.kimlik)
+    SELECT 1 FROM kasa.cift_uye u JOIN alt ON u.eser_kimlik = alt.kimlik) THEN
+    RAISE EXCEPTION 'bagli hizalanmis cifti olan eserin ust_eser_kimlik degeri degistirilemez';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER eser_ust_degisim BEFORE UPDATE OF ust_eser_kimlik ON omurga.eser
+  FOR EACH ROW EXECUTE FUNCTION omurga.eser_ust_degisim_denetle();
+
 -- Yazan işlevler yalnız tetikleyici olarak çalışır; doğrudan çağrılamaz.
 REVOKE EXECUTE ON FUNCTION omurga.surum_izle(), omurga.kimlik_tekrar_yasak(), omurga.varlik_kaydet(),
   omurga.vektor_doldur_denetle(), kasa.turkce_birim_doldur(), kasa.arapca_birim_doldur(), kasa.cift_uye_doldur(),
-  kasa.vektor_boyut_denetle(), kasa.kurum_surum() FROM PUBLIC;
+  kasa.vektor_boyut_denetle(), kasa.kurum_surum(), omurga.eser_ust_degisim_denetle() FROM PUBLIC;
 
 ------------------------------------------------------------------------------
 -- Satır düzeyinde güvenlik (kasa)
