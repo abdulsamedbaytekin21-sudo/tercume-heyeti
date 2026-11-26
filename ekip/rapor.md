@@ -1,10 +1,13 @@
 ## Sizden beklenen
-1. Konuk'un Fusûs şerhinin dijital kopyası (PDF/tarama). G-003 bunu bekliyor.
-2. Dört eserin (Konuk Fusûs şerhi, Demirli Fusûs, Demirli Nusûs, Demirli Miftâh) önsöz/künye sayfalarının fotoğrafı ya da taraması: çevirinin hangi Arapça baskıya dayandığı ancak buradan okunabiliyor (G-008).
+1. Konuk Fusûs şerhinin dijital kopyası (G-003 bunu bekliyor).
+2. Önsöz + iç kapak fotoğrafları (dayanılan Arapça baskı ancak buradan okunur):
+   Konuk/Tahralı-Eraydın I. ve IV. cilt önsözleri (Marmara mı TYEK mi belirtin); Demirli Fusûs (Kabalcı);
+   Demirli "Vahdet-i Vücûd ve Esasları" (Nusûs); Demirli Miftâh ("Tasavvuf Metafiziği" 2002 ve/veya TYEK 2014).
+3. EVREN_URL ve EVREN_ANAHTAR ortam değişkenleri (G-011 bunu bekliyor).
 
 ## Durum (26.11)
-- Bitti: G-007 iskelet, G-004 metin hazırlama akışı (7 test geçti), G-001 envanter v1 (dayanılan baskılar "doğrulanmadı").
-- Denetimde: G-002 şema v1 (G-009) ve G-006 ıstılah protokolü + 30 terim (G-010). 40 tanıklığın hepsi baskı belirlenmediği için "düşük güven".
-- Sürüyor: G-005 gömme test seti (Mümeyyiz), G-008 baskı tespiti (Kütüphaneci).
-- Ortama islamansiklopedisi.org.tr ağ izni eklendi (TDV maddeleri için).
-- Hukuki sorular H-1..H-4 veri/envanter/ozet.md'de; hukukçu görüşü için bekliyor.
+- Bitti: G-007 iskelet, G-004 metin akışı, G-001/G-008 envanter v2 (Nusûs künyesi bulundu; baskılar önsöz bekliyor).
+- Denetimde (Mümeyyiz): G-009 şema v1, G-010 ıstılah protokolü + 30 terim. Sürüyor: G-005 gömme test seti.
+- T-0009 işlendi: main birleştirildi; EVREN ayarı yok, G-011 "bekliyor". Ayar gelene kadar işler Claude ile.
+- Kota: bundan sonra Opus yalnızca Mümeyyiz denetimi ve ıstılah/anlam kararlarında; diğer her şey Sonnet/Haiku.
+- Hukuki sorular H-1..H-5 veri/envanter/ozet.md'de.
