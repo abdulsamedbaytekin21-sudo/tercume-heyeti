@@ -156,8 +156,9 @@ def clean_ar(s):
     s = s.replace(TATWEEL, "")
     # شيء: ي ile ء arasına giren ayırıcı boşluk (glif aralığı) kaldırılır
     s = re.sub("(ي[\u064b-\u065f]*) (?=[\u064b-\u065f]*ء)", r"\1", s)
-    s = unicodedata.normalize("NFKC", s)   # sunum biçimleri varsa standarda
-    s = unicodedata.normalize("NFC", s)
+    # sunum biçimleri varsa standarda; ﷺ (U+FDFA) gibi kısaltma ligatürleri NFKC ile açılmaz, olduğu gibi korunur
+    s = "".join(p if KORUNAN.fullmatch(p) else unicodedata.normalize("NFC", unicodedata.normalize("NFKC", p))
+                for p in re.split("(" + KORUNAN.pattern + ")", s) if p)
     s = re.sub(r"\s+", " ", s).strip()
     s = re.sub("^[\u064b-\u065f\u0670 ]+", "", s)   # satır başına kaçan yetim hareke
     return s
@@ -211,15 +212,69 @@ def aile(yazi):
     return "nimbus" if "Nimbus" in yazi else ("bold" if "Bold" in yazi else "garamond")
 
 
+LINE_TOL = 6.0   # aynı görsel satırdaki Arapça/Türkçe parçaların top farkı (satır aralığı >= 14)
+KORUNAN = re.compile("[\ufdf0-\ufdff]")   # ﷺ ﷲ gibi Arapça kısaltma ligatürleri: NFKC genişletmez, olduğu gibi kalır
+
+
+def _satirlara_ayir(items):
+    """Parçaları top'a göre görsel satırlara kümeler; her satırı mantıksal okuma sırasına koyar.
+
+    Yalnız Arapça (ya da [x/y] işaretli) satır: sağdan sola (beyit hemistişleri).
+    Karışık satır (Türkçe + satır içi Arapça): parçalar soldan sağa (x0); bitişik Arapça/[x/y] parçaları
+    kendi aralarında sağdan sola. Böylece Türkçe parça sırası ve satır sonu tire doğru kalır (G-026, Ö-1).
+    """
+    items = sorted(items, key=lambda it: it["top"])
+    kumeler = []
+    for it in items:
+        if kumeler and it["top"] - kumeler[-1][0] <= LINE_TOL:
+            kumeler[-1][1].append(it)
+        else:
+            kumeler.append([it["top"], [it]])
+    satirlar = []
+    for _, k in kumeler:
+        ar_var = any(it["mod"] == "ar" for it in k)
+        for it in k:
+            it["satir_ar"] = ar_var
+            it["yalniz_isaret"] = it["isaret"] and len(k) == 1 and not ar_var   # kendi satırında duran [x/y]
+            if not ar_var:          # [x/y] Arapça satırın içindeyse bölüm işaretidir
+                it["isaret"] = False
+        benzer = lambda it: it["mod"] == "ar" or it["isaret"]
+        if all(benzer(it) for it in k):
+            sirali = sorted(k, key=lambda it: -it["x0"])
+        else:
+            k = sorted(k, key=lambda it: it["x0"])
+            sirali, i = [], 0
+            while i < len(k):
+                if benzer(k[i]):
+                    j = i
+                    while j < len(k) and benzer(k[j]):
+                        j += 1
+                    sirali += sorted(k[i:j], key=lambda it: -it["x0"])
+                    i = j
+                else:
+                    sirali.append(k[i])
+                    i += 1
+        satirlar.append(sirali)
+    return satirlar
+
+
+def _isaret_blok(it):
+    return {"tur": "isaret", "dil": "tr", "ham": it["ham"], "metin": it["tem"].strip(), "top": it["top"],
+            "x0": it["x0"], "x1": it["x1"], "boyut": it["boyut"], "yazi": it["yazi"]}
+
+
 def page_blocks(pg):
-    """Bir sayfa için blok listesi: (tur, dil, ham, temiz, top, x0, boyut, yazi)."""
+    """Bir sayfa için blok listesi, okuma sırasında: (tur, dil, ham, metin, top, x0, boyut, yazi).
+
+    Satır içi Arapçalı Türkçe satırlarda blok sırası: Türkçe | Arapça | Türkçe (G-026).
+    Dipnot ayracının altındaki Arapça dipnot bloğunun içinde "{ar: ...}" olarak kalır, gövdeye sızmaz.
+    """
     chars = [c for c in pg.chars if c["text"] != "\x00"]
     sep = None
     for ln in pg.lines + pg.rects:
         if abs(ln["bottom"] - ln["top"]) < 1.5 and 50 < ln["x1"] - ln["x0"] < 320 and ln["top"] > 400:
             sep = ln["top"]
-    blocks = []
-    tr_lines = []   # (top, x0, size, font, ham, temiz)
+    items = []
     for mode, run in split_runs(chars):
         bases = [c for c in run if not (mode == "ar" and is_mark(c["text"]))]
         if not bases:
@@ -230,48 +285,92 @@ def page_blocks(pg):
             ham, tem = ar_logical(run)
             if not tem:
                 continue
-            blocks.append({"tur": "arapca", "dil": ar_lang(tem), "ham": ham, "metin": tem,
-                           "top": top, "x0": x0, "x1": max(c["x1"] for c in bases),
-                           "boyut": run[0]["size"], "yazi": "Scheherazade"})
+            items.append({"mod": "ar", "isaret": False, "dil": ar_lang(tem), "ham": ham, "tem": tem,
+                          "top": top, "x0": x0, "x1": max(c["x1"] for c in bases),
+                          "boyut": run[0]["size"], "yazi": "Scheherazade"})
         else:
             ham, tem = tr_line_text(run, None)
             if not tem.strip():
                 continue
             big = max(c["size"] for c in run)
             fn = max(set(c["fontname"].split("+")[-1].split("#")[0] for c in run), key=lambda f: sum(1 for c in run if c["fontname"].split("+")[-1].split("#")[0] == f))
-            tr_lines.append({"top": top, "x0": x0, "boyut": big, "yazi": fn, "ham": ham, "tem": tem})
-    # Türkçe satırları paragraflara topla
-    tr_lines.sort(key=lambda l: l["top"])
-    ar_tops = [b["top"] for b in blocks if b["tur"] == "arapca"]
-    body_left = min([l["x0"] for l in tr_lines if l["top"] > HEADER_TOP and l["boyut"] >= BODY_MIN] or [68])
-    paras = []
-    for l in tr_lines:
-        if l["top"] < HEADER_TOP:
-            if paras and paras[-1]["tur"] == "baslik_sayfa":
-                paras[-1]["satirlar"].append(l)
+            items.append({"mod": "tr", "isaret": bool(re.fullmatch(r"\[\d+/\d+\]", tem.strip())), "ham": ham, "tem": tem,
+                          "top": top, "x0": x0, "x1": max(c["x1"] for c in run), "boyut": big, "yazi": fn})
+    satirlar = _satirlara_ayir(items)
+    for si, sat in enumerate(satirlar):
+        for it in sat:
+            it["satir"] = si
+    sirali = [it for sat in satirlar for it in sat]
+    body_left = min([it["x0"] for it in sirali if it["mod"] == "tr" and it["top"] > HEADER_TOP and it["boyut"] >= BODY_MIN] or [68])
+
+    out = []        # blok sözlükleri ya da açık paragraflar ({"p": ...})
+    acik = None     # açık paragraf: {"p": True, "tur", "ogeler": [item...]}
+
+    def ac(tur, it):
+        nonlocal acik
+        acik = {"p": True, "tur": tur, "ogeler": [it]}
+        out.append(acik)
+
+    for it in sirali:
+        if it["top"] < HEADER_TOP and it["mod"] == "tr":
+            if acik and acik["tur"] == "baslik_sayfa":
+                acik["ogeler"].append(it)
             else:
-                paras.append({"tur": "baslik_sayfa", "satirlar": [l]})
-        elif sep is not None and l["top"] >= sep:
-            if re.match(r"^\s*\d{1,4}[  ]", l["tem"]) or not paras or paras[-1]["tur"] != "dipnot":
-                paras.append({"tur": "dipnot", "satirlar": [l]})
+                ac("baslik_sayfa", it)
+        elif sep is not None and it["top"] >= sep:
+            if it["mod"] == "ar":
+                if not (acik and acik["tur"] == "dipnot"):
+                    ac("dipnot", it)
+                else:
+                    acik["ogeler"].append(it)
+            elif re.match(r"^\s*\d{1,4}[  ]", it["tem"]) or not (acik and acik["tur"] == "dipnot"):
+                ac("dipnot", it)
             else:
-                paras[-1]["satirlar"].append(l)
+                acik["ogeler"].append(it)
+        elif it["mod"] == "ar":
+            acik = None
+            out.append({"tur": "arapca", "dil": it["dil"], "ham": it["ham"], "metin": it["tem"], "top": it["top"],
+                        "x0": it["x0"], "x1": it["x1"], "boyut": it["boyut"], "yazi": it["yazi"]})
+        elif it["isaret"]:
+            acik = None
+            out.append(_isaret_blok(it))
         else:
-            yeni = (not paras or paras[-1]["tur"] in ("baslik_sayfa", "dipnot")
-                    or l["x0"] > body_left + 5
-                    or aile(l["yazi"]) != aile(paras[-1]["satirlar"][-1]["yazi"])
-                    or l["top"] - paras[-1]["satirlar"][-1]["top"] > 20
-                    or any(paras[-1]["satirlar"][-1]["top"] - 5 <= a <= l["top"] - 5 for a in ar_tops))
-            if yeni:
-                paras.append({"tur": "gövde", "satirlar": [l]})
+            son = acik["ogeler"][-1] if acik and acik["tur"] == "gövde" else None
+            if son is None:
+                yeni = True
             else:
-                paras[-1]["satirlar"].append(l)
-    for p in paras:
-        ls = p["satirlar"]
-        if p["tur"] == "baslik_sayfa":
-            ls.sort(key=lambda l: l["x0"])
-        tem = tr_clean([l["tem"] for l in ls])
+                ayni = son["satir"] == it["satir"]
+                yeni = ((it["x0"] > body_left + 5 and not ayni)
+                        or aile(it["yazi"]) != aile(son["yazi"])
+                        or (it["top"] - son["top"] > 20 and not ayni))
+            # kendi satırında duran [x/y]: yeni paragraf başlıyorsa ya da Arapçalı satırı izliyorsa bölüm işaretidir
+            if it["yalniz_isaret"] and (yeni or (son is not None and son["satir_ar"])):
+                acik = None
+                out.append(_isaret_blok(it))
+            elif yeni:
+                ac("gövde", it)
+            else:
+                acik["ogeler"].append(it)
+
+    blocks = []
+    for p in out:
+        if not p.get("p"):
+            blocks.append(p)
+            continue
+        ls = p["ogeler"]
         tur = p["tur"]
+        if tur == "baslik_sayfa":
+            ls = sorted(ls, key=lambda l: l["x0"])
+        parcalar = []
+        for l in ls:
+            if l["mod"] == "ar":      # yalnız dipnotta: bitişik Arapça parçaları tek {ar: ...} olur
+                if parcalar and parcalar[-1][0] == "ar":
+                    parcalar[-1][1].append(l["tem"])
+                else:
+                    parcalar.append(("ar", [l["tem"]]))
+            else:
+                parcalar.append(("tr", l["tem"]))
+        tem = tr_clean([("{ar: " + " ".join(v) + "}") if k == "ar" else v for k, v in parcalar])
         if tur == "gövde":
             f = ls[0]["yazi"]
             if re.match(r"^(Ya[’'‘]?ni|Tercüme|Meâl|Terceme)\b", tem) or "Nimbus" in f:
@@ -283,16 +382,6 @@ def page_blocks(pg):
         blocks.append({"tur": tur, "dil": "tr", "ham": "\n".join(l["ham"] for l in ls), "metin": tem,
                        "top": ls[0]["top"], "x0": ls[0]["x0"], "x1": 0,
                        "boyut": ls[0]["boyut"], "yazi": ls[0]["yazi"]})
-    # Okuma sırası: yukarıdan aşağı; aynı satırdaki Arapça parçalar sağdan sola
-    def key(b):
-        return (round(b["top"] / 6), -b["x0"] if b["tur"] == "arapca" else b["x0"])
-    ar_idx = [b for b in blocks if b["tur"] == "arapca"]
-    # Arapça blokları kendi aralarında satır kümesine göre sırala
-    for b in blocks:
-        if b["dil"] == "tr" and re.fullmatch(r"\[\d+/\d+\]", b["metin"]):
-            b["tur"] = "isaret"   # Arapça satır içine giren "[6/45]" Fusûs bölüm/sayfa işareti
-    satirda = ("arapca", "isaret")
-    blocks.sort(key=lambda b: (round(b["top"] / 6) * 6 if b["tur"] in satirda else b["top"], -b["x0"] if b["tur"] in satirda else 0))
     return blocks
 
 

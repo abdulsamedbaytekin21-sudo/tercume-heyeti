@@ -2,7 +2,7 @@
 
 Kaynak: Ahmed Avni Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi, 1. cilt (TYEK çeviri yazı), PDF 892 s. (InDesign, metin katmanlı).
 Girdi (telifli, değişmedi): `veri/kasa/envanter/konuk1/konuk1.pdf`. Çıktı (telifli): `veri/kasa/metin/konuk1/`.
-Kod: `metin/konuk/cikar.py`, test: `metin/konuk/test_cikar.py` (`cd metin/konuk && python3 -m unittest`, 15 test, sentetik veri).
+Kod: `metin/konuk/cikar.py`, test: `metin/konuk/test_cikar.py` (`cd metin/konuk && python3 -m unittest`, 20 test, sentetik veri).
 Bu dizine telifli metin konmaz; çıktı yalnız kasadadır.
 
 ## Kullanım
@@ -11,13 +11,13 @@ Gerekli: pdfplumber (pdfminer.six), Pillow, `pdftoppm`, `tesseract` (yalnız met
 
 ## Çıktılar
 - `ham.jsonl`: blok başına `sayfa` (PDF), `basili_sayfa` (üst bilgiden), `sira`, `tur`, `dil`, `ham` (PDF metin akışı, hiç düzeltilmemiş; Arapçada görsel sıra ve U+FFFD dahil), `yazi`, `boyut`, `top`, `x0`.
-- `temiz.jsonl`: aynı anahtarlar, `ham` yerine `metin` (mantıksal sıra, düzeltilmiş). Normalleştirme (hareke kaldırma vb.) yapılmaz; o katman `metin/normallestir.py`'nin işidir.
+- `temiz.jsonl`: aynı anahtarlar, `ham` yerine `metin` (mantıksal sıra, düzeltilmiş). Normalleştirme (hareke kaldırma, ﷺ'nin açık yazıya çevrilmesi vb.) yapılmaz; o katman `metin/normallestir.py`'nin işidir.
 - `cid_sayim.json`: hemzeli elif glif (CID) sayımı; yeni, tanınmayan CID çıkarsa betik uyarı basar.
 - Blok türleri: `arapca` (dil `ar` / `fa` sezgisel), `terceme`, `serh`, `baslik`, `baslik_sayfa` (üst bilgi: sayfa no + koşan başlık), `dipnot`, `isaret` (Arapça satıra giren "[6/45]" gibi bölüm işareti), `ocr_sayfa`.
-- Toplam 13 485 blok: 4 498 Arapça/Farsça satır, 3 821 şerh, 3 670 tercüme, 846 üst bilgi, 445 dipnot, 156 başlık, 44 işaret, 5 OCR sayfası.
+- Toplam 12 690 blok (G-026 sonrası): 4 448 Arapça/Farsça satır, 3 084 şerh, 3 665 tercüme, 846 üst bilgi, 442 dipnot, 156 başlık, 44 işaret, 5 OCR sayfası.
 
 ## Metin katmanı bulguları (Arapça)
-1. Arapça Scheherazade ile dizilmiş, harfler **görsel (soldan sağa) sırada** gelir; her satır parçası harf harf tersine çevrilerek mantıksal sıra elde edilir. Sunum biçimli harf yok (NFKC yine uygulanır). Hareke, akışta tabanından önce geldiği için ters çevirmeyle tabanın ardına düşer; doğrulandı.
+1. Arapça Scheherazade ile dizilmiş, harfler **görsel (soldan sağa) sırada** gelir; her satır parçası harf harf tersine çevrilerek mantıksal sıra elde edilir. Sunum biçimli harf yok (NFKC yine uygulanır; ﷺ ﷲ ﷵ gibi U+FDF0–FDFF kısaltma ligatürleri hariç, bunlar olduğu gibi korunur). Hareke, akışta tabanından önce geldiği için ters çevirmeyle tabanın ardına düşer; doğrulandı.
 2. Hemzeli elif (أ إ آ) metinde **sıfır genişlikli hemze + ayrı elif tabanı** (U+FFFD ya da ا, lam-elif ligatüründe ا) olarak gelir; "�" bu tabandır. Kural: her hemzeli harf, akışta bitişik ve genişliği hemzenin x'ini kapsayan tabanı yutar. Yalnız kalan U+FFFD, ا olur. (İlk deneme olan "aynı x'teki FFFD'yi at" kuralı lam/fe/şın sonrasındaki hemzelerde `فاإن`, `الاأرض` gibi fazladan elif üretiyordu; düzeltildi.)
 3. أَ ve أُ **tek glif**tir ve metin katmanında yalnız U+0623 görünür: fetha/damme düz metinden okunamaz. pdfminer kancasıyla glif CID'si alınır: s. 84'te sayfa görüntüsüne karşı doğrulanarak 1110 = أَ, 1111 = أُ, 913 = harekesiz أ; 914 = إ (kesre ayrı karakter), 912 = آ. Eşleme örnek sayfalarla doğrulandı, tüm ciltte başka CID çıkmadı.
 4. `ي` ile `ء` arasına giren ayırıcı boşluk (شيء) silinir. Satır başına kaçan yetim hareke atılır. Tatvil (ـ) çıkarılır.
@@ -37,7 +37,23 @@ Sayfalar (PDF): 84, 144, 176, 304, 500, 701 (6 sayfa; Arapça, Farsça beyit, â
 ## Bilinen sorunlar
 - PDF s. 4-7, 9 (Takdim vb.) metin katmansız: Tesseract (`eng`; `tur` modeli kurulu değil) ile okundu, `tur: ocr_sayfa`. Türkçe aksan ve harfler (ı ş ğ ü) kaybolur ("kiiltiir"); **güvenilmez, Türkçe model gelince yeniden okunmalı**. S. 8, 24, 122, 142, 464, 600, 654, 750, 892 boş sayfadır (mürekkep yok), çıktıda yer almaz.
 - Ön bölümde (s. 1-25) ayraçsız kutu notu (s. 17) satır satır paragraf olur; dipnot ayrımı yalnız ayraç çizgisi olan sayfalarda çalışır.
-- Arapça içeren Türkçe paragraf (satır içi Arapça) bloğa Arapça satırın üstünden ve altından ayrı iki paragraf olarak girer; tek paragraf olarak birleştirilmez (Mukabeleci bilsin).
+- Arapça içeren Türkçe paragraf (satır içi Arapça) tek blok olmaz: blok sırası Türkçe | Arapça | Türkçe olarak okuma sırasındadır (G-026'dan sonra doğru sırada); birleştirme tüketicinin (hat.py) işidir.
+- Dipnottaki Arapça `dipnot` bloğunun içinde `{ar: ...}` olarak durur (G-026); dipnot varyantını pasaja bağlamak hat.py'nin işidir (denetim Ö-2).
 - `dil` ayrımı (ar/fa) işlev sözcüğü sezgisidir; kısa Farsça mısralar `ar` kalabilir.
 - Arapçada çok kısa blok (tek harf, ör. "m") sayfa üzerindeki yazı tipi artığı olabilir (p. 98); elle kontrol edilmedi.
 - Harekenin metin katmanı sağlam kabul edildi (PDF'nin kendisi); yalnız أَ/أُ özel işlendi. Başka glif-birleşik hareke (örn. ligatür içinde) görsel olarak taranmadı; CID envanteri her 13. sayfadan örneklemle çıkarıldı (tam cilt koşusunda yeni hemzeli elif CID'si görülmedi).
+
+## G-026 düzeltmesi (Denetim G-003: Ö-1, Ö-2, K-1)
+Neden: Türkçe parçalar `top`'a göre sıralanıyor, Arapça ayrıca `top/6`'ya göre sıralanıyor ve Arapça satırın hemen altındaki Türkçe satır
+(`any(ar_top ...)` kuralı) her zaman yeni paragraf sayılıyordu. Satır içi Arapçalı bir satırda "Türkçe | Arapça | Türkçe" parçaları (üst
+üste 1-1,5 pt fark) yanlış sıraya düşüyor, satır sonu tire yanlış parçayla birleşiyordu (s. 177, 194, 214, 216, 220).
+Yöntem: parçalar `top` ile görsel satırlara kümelenir (tolerans 6 pt, satır aralığı >= 14 pt); karışık satırda Türkçe parçalar x0'a göre soldan sağa,
+bitişik Arapça/[x/y] parçaları kendi aralarında sağdan sola; yalnız Arapça satırda eskisi gibi sağdan sola. Arapçalı satırı izleyen
+Türkçe satır artık otomatik yeni paragraf olmaz (girinti/yazı tipi/aralık kuralları geçerli). Dipnot ayracının altındaki Arapça (Ö-2) dipnot
+paragrafına `{ar: ...}` olarak katılır, gövdede `arapca` bloğu olmaz. K-1: U+FDF0–FDFF aralığı NFKC dışında bırakıldı (ham/temiz katmanda ﷺ aynen).
+Önce/sonra (tüm cilt, 892 s.): temiz.jsonl 13 485 -> 12 690 blok; şerh 3 821 -> 3 084 (yanlış bölünmüş paragraflar birleşti), tercüme 3 670 -> 3 665,
+dipnot 445 -> 442 (dipnota giren Arapça satırlar yüzünden birleşen dipnotlar), arapca 4 498 -> 4 448 (50 satır dipnota geçti; dipnotta 25 blokta
+35 `{ar: ...}` parçası, gövdede 0), isaret 44 -> 44 (küme aynı). 508 sayfada en az bir blok değişti. Karışık (Türkçe+Arapça) görsel satır: 1 329,
+502 sayfada. U+FDFA: 0 -> 31 blok (açık yazı "صلى الله عليه وسلم" 31 -> 0); U+FDF5 (ﷵ) vb. de korunur.
+Elle kontrol: s. 177, 194, 214, 216, 220 sayfa görüntüsüyle satır satır karşılaştırıldı (Türkçe parçalar ve Arapça sırası birebir); s. 196 dipnot 110/111 `dipnot`ta, gövdede yok.
+Önceki sürüm yedeği çalışma dizininde tutulmadı (yeniden üretim 1 dk).
