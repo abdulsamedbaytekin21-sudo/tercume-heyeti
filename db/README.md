@@ -15,13 +15,13 @@ Yapılandırılmış katman (PostgreSQL, hakikat kaynağı) ve vektör katmanı 
 **omurga** (ortak, telifsiz Arapça veri ve kavram ağı)
 - `donem`, `ekol`: kendi üst kaydına bağlı; `dis_kimlik` (ör. `ekol:ekberi`).
 - `eser` → `baski` → `metin_birimi`. **Asıl metin ve şerh ayrı eserdir**; şerh→asıl bağı `eser.ust_eser_kimlik` (FK, döngü denetimli). `serh_eder` ilişki kenarı eserler arasında açılırsa bu bağla çelişemez (tetikleyici reddeder).
-- `baski`: `tur` (nesir/serh/ceviri), `dil`, `lisans_sinifi`, ham dosya sha256. Üretilmiş `omurga_uygun` (= dil `ar` ve tür `ceviri` değil ve lisans `telifli` değil) ve `kasa_uygun` (= dil `ar` değil) sütunları metnin nereye girebileceğini belirler.
+- `baski`: `tur` (nesir/serh/ceviri), `dil`, `lisans_sinifi`, ham dosya sha256. Üretilmiş `omurga_uygun` (= dil `ar` ve tür `ceviri` değil ve lisans `telifli` değil), `kasa_uygun` (= dil `ar` değil) ve `kasa_arapca_uygun` (= dil `ar` ve tür `ceviri` ya da lisans `telifli`) sütunları metnin nereye girebileceğini belirler; her baskı bu üç kümeden en çok birine düşer (`omurga_uygun` ve `kasa_arapca_uygun` ayrıktır).
 - `metin_birimi`: yalnız `omurga_uygun` baskıya bağlanır. `kok_dizisi`, `lemma_dizisi` `text[]` (GIN dizinli); `metin_normal` pg_trgm dizinli.
 - `terim` (kök `text[]`) → `anlam` → `taniklik`. Anlam ekol/dönem taşımaz; ekol, dönem, müellif tanıklıkta durur.
 - `iliski`: türlendirilmiş kenar; uçları `varlik_kayit` üzerinden herhangi bir omurga varlığına bağlanır; tür `iliski_turu` tablosundan (`ilgili`, `sarih_yorumu`, `yerine_gecen` dahil).
 - `gomme_modeli` + `vektor`: türetilmiş veri. Model kaydı değişmez (ad, sürüm, boyut, ön işleme; ayar değişirse yeni model kaydı). Boyut tetikleyiciyle model kaydına karşı doğrulanır; `girdi_ozeti` bayatlık denetimi içindir.
 
-**kasa** (kurum kasası, satır düzeyinde güvenlik): `kurum`, `turkce_birim` (Arapça dışı her metin: telifli çeviri, Türkçe şerh, Türkçe neşir), `cift` + `cift_uye` (1-n, n-1, n-m), `terim_karari`, `vektor`; görünümler `cift_eser`, `vektor_eser`.
+**kasa** (kurum kasası, satır düzeyinde güvenlik): `kurum`, `turkce_birim` (Arapça dışı her metin: telifli çeviri, Türkçe şerh, Türkçe neşir), `arapca_birim` (omurgaya girmeyen Arapça baskının metni: telifli tahkik ya da Arapçaya çeviri; kimlik/sürüm/RLS `turkce_birim` ile aynı, alanlar `metin_birimi`'ni izler), `cift` + `cift_uye` (1-n, n-1, n-m; Arapça üye ya `arapca_birim_kimlik` = omurga birimi ya `kasa_arapca_birim_kimlik` = kasa birimi, tam biri), `terim_karari`, `vektor`; görünümler `cift_eser`, `vektor_eser`.
 
 **Kavram kayıtlarının ortak kalıbı** (`terim`, `anlam`, `taniklik`, `iliski`; `ornek_30.jsonl` v2 ile eşlenir)
 | JSONL | Şema |
@@ -38,13 +38,13 @@ Her tabloda `kimlik uuid` (PK, değişmez) ve `surum` (her UPDATE'te +1, elle ya
 ## İzolasyon
 - Kasa tablolarının hepsi `ENABLE + FORCE ROW LEVEL SECURITY`; politika `kurum_kimlik = kasa.gecerli_kurum()` (oturum ayarı `heyet.kurum`). Ayar yoksa hiçbir satır görünmez/yazılmaz.
 - Kasa içindeki tüm bağlar bileşik `(kurum_kimlik, kimlik)` FK'dir: bir kurum başka kurumun birimine/çiftine bağlanamaz; var olmayan ile başka kurumun kimliği aynı hatayı verir.
-- **Türkçe/telifli metin omurgaya hiçbir yoldan giremez** ve bu `tur`'a değil dil+lisansa bağlıdır: `metin_birimi → baski` bileşik FK'si `omurga_uygun` bayrağını taşır; baskının dili/türü/lisansı sonradan bağlı birim varken değiştirilirse FK reddeder. `kasa.turkce_birim` yalnız `dil<>'ar'` baskıya bağlanır.
+- **Türkçe/telifli metin omurgaya hiçbir yoldan giremez** ve bu `tur`'a değil dil+lisansa bağlıdır: `metin_birimi → baski` bileşik FK'si `omurga_uygun` bayrağını taşır; baskının dili/türü/lisansı sonradan bağlı birim varken değiştirilirse FK reddeder. `kasa.turkce_birim` yalnız `dil<>'ar'` baskıya, `kasa.arapca_birim` yalnız `kasa_arapca_uygun` baskıya bağlanır; telifli Arapça metin omurgaya girmez, kasada durur.
 - Roller: omurga rolleri kasa şemasına erişemez; kasa yazarı omurgayı yalnız okur. `surum_gecmisi` (iki şema) ve `varlik_kayit` tablolarına hiçbir istemci rolü yazamaz (yalnız SELECT); yazan tetikleyici işlevler `SECURITY DEFINER` + sabit `search_path`, doğrudan çağrılamaz. Geçmiş `kullanici` sütunu `session_user`'dır.
 - Süper kullanıcı RLS'yi atlar. `heyet.kurum` oturum beyanıdır (pilotta kalır; ikinci kurumdan önce kurum başına rol + `current_user` eşlemesi zorunlu, bkz. kararlar.md).
 
 ## Eser bazında dışarıda bırakma (şerhler dahil)
 Elle yazılan eser etiketi yoktur; eser her zaman birimden türer:
-`metin_birimi.eser_kimlik`, `kasa.turkce_birim.eser_kimlik` baskıdan; `omurga.vektor.eser_kimlik` hedef birimden; `kasa.cift_uye.eser_kimlik` üye biriminden türetilir (yanlış değer bileşik FK ile reddedilir). Çiftin eseri üyelerinden okunur (`kasa.cift_eser`), kasa vektörünün eseri `kasa.vektor_eser`'den. Bir çiftin üyeleri aynı şerh ağacından olmalıdır (asıl metin Arapça + şerhin Türkçesi).
+`metin_birimi.eser_kimlik`, `kasa.turkce_birim.eser_kimlik` baskıdan; `omurga.vektor.eser_kimlik` hedef birimden; `kasa.arapca_birim.eser_kimlik` baskıdan, `kasa.cift_uye.eser_kimlik` üye biriminden (omurga, kasa Arapça ya da kasa Türkçe birim) türetilir (yanlış değer bileşik FK ile reddedilir). Çiftin eseri üyelerinden okunur (`kasa.cift_eser`), kasa vektörünün eseri `kasa.vektor_eser`'den (vektör Türkçe birime, Arapça kasa birimine ya da çifte bağlanır; tam biri). Bir çiftin üyeleri aynı şerh ağacından olmalıdır (asıl metin Arapça + şerhin Türkçesi).
 ```sql
 -- test eseri :t ve şerhleri dışarıda; omurga vektörleri
 SELECT v.* FROM omurga.vektor v WHERE v.eser_kimlik NOT IN (SELECT omurga.dislama_kumesi(:'t'));
@@ -62,7 +62,7 @@ Planlayıcı dizini **ancak** sorguda aynı `gomme::vector(1024)` ifadesi ve ayn
 
 ## Bilinen sınırlar ve açık noktalar
 - `omurga.anlam.tanim` ve `taniklik.alinti` serbest metindir; kasadaki `terim_karari.karsilik_tr` (çeviriden türeyen) buraya elle kopyalanamaz diye teknik engel yoktur. Girişi kural/inceleme sınırlar (`inceleme`, `durum`); omurgaya "serbest karşılık" yolu ayrı arındırma göçü ve hukukçu görüşü ister.
-- **Açık karar (Reis):** `lisans_sinifi='telifli'` Arapça (muhakkik hakkı) baskı artık omurgaya **girmez** ve kasa tablosu da Arapça kabul etmez; böyle bir baskı gerekirse ya lisansı yeniden sınıflandırın ya da kasada Arapça birim tablosu açan bir göç gerekir.
+- **Telifli Arapça baskı (G-019, Reis kararı; hukukçu görüşüne kadar geçici):** metni omurgaya girmez, `kasa.arapca_birim`'e girer. Hukukçu klasik metnin tahkikten ayrılabileceğini söylerse karar gözden geçirilir (baskı lisansı yeniden sınıflandırılınca birimlerin kasadan omurgaya taşınması ayrı göç işidir). `kasa.arapca_birim.metin`/`metin_normal` telifli içeriktir; omurgadaki serbest metin alanlarına kopyalanmasını engelleyen teknik bir bağ yoktur; kural/inceleme sınırlar.
 - Onay kuralı onay anında denetlenir; onaylı tanıklık sonradan geri çekilirse bağlı onaylı anlam otomatik düşmez (inceleme işidir).
 - Kimlik yeniden kullanım denetimi kasada yalnız çağıran kurumun görünürlüğü içindedir (uuid çakışması ayrıca birincil anahtarla engellenir).
 
@@ -99,3 +99,19 @@ Geçici PG 16.15 + pgvector 0.6.0 kümesi (`/var/tmp/g002_pg`, yalnız soket, i�
 | Geçen (G-009) | Kurum yok → 0 satır; omurga rolü kasaya; kasa yazarı omurgaya; A, B'yi görmez/B adına yazmaz; okur yazamaz; 7/7 kasa tablosu ENABLE+FORCE; kimlik değişimi; elle `surum` | Hepsi önceki gibi doğru |
 | Ö1 | `heyet.kurum` beyanı | Pilot kararıyla ertelendi (kararlar.md), değişmedi |
 | Ö1 hariç özeti | | Engelleyici E1–E3 ve önemli Ö2–Ö4 kapandı; K1–K5 giderildi/belgelendi |
+
+## G-019 denemeleri (kasada Arapça birim)
+Geçici PG 16 kümesi (`/var/tmp/g019_pg`, yalnız soket, iş bitince silindi), `000` + `001`; up, down, up temiz (down kasayı ve omurgayı birlikte düşürür, tablo eklemek down'ı değiştirmez).
+| Deneme | Sonuç |
+|---|---|
+| Telifli Arapça baskıya `kasa.arapca_birim` (A kurumu) | Kabul; `eser_kimlik` baskıdan türedi, sürüm 1, güncellemede 2 ve geçmişte 1 |
+| Serbest Arapça baskıya / Türkçe baskıya `arapca_birim` | Reddedildi (tetikleyici) |
+| Telifli Arapça baskıya `omurga.metin_birimi`; kasa yazarı omurgaya | Reddedildi (tetikleyici / `permission denied`) |
+| Telifli Arapça baskıya `kasa.turkce_birim` | Reddedildi |
+| Baskı `lisans→serbest` ya da `dil→tr` (kasa birimi varken) | Reddedildi (bileşik FK) |
+| Çift: Arapça taraf `kasa_arapca_birim_kimlik`, Türkçe taraf `turkce_birim`; ikisi birden ya da hiçbiri | İlk ikisi kabul; ikisi birden CHECK, hiçbiri tetikleyici ile reddedildi |
+| `kasa.vektor` Arapça kasa birimine; `vektor_eser` | Kabul; eser görünümde |
+| Dışlama (test eseri = telifli baskının eseri): kasa Arapça birim, çift, vektör | Dördü de 0 satır kaldı; başka test eserinde 1/1/1 kaldı |
+| B kurumu: A'nın birimine çift üyesi, `ust_birim`, vektör; A adına yazma | Hepsi reddedildi (FK/RLS); B'nin A birimini görmesi 0 satır |
+| Kurum ayarsız; okur rolü yazma; omurga rolü | 0 satır; `permission denied`; `permission denied for schema kasa` |
+| `kimlik` değiştirme; silinen kimlikle yeniden ekleme | Reddedildi |

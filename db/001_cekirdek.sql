@@ -200,9 +200,12 @@ CREATE TABLE omurga.baski (
   -- bileşik FK'lerle birimlere bağlanır: baskı sonradan değişip uygunluğu bozarsa, bağlı birim varken reddedilir.
   omurga_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND tur <> 'ceviri' AND lisans_sinifi <> 'telifli') STORED,
   kasa_uygun boolean GENERATED ALWAYS AS (dil <> 'ar') STORED,
+  -- Omurgaya girmeyen Arapça baskı (telifli tahkik, Arapçaya çeviri) kasada kasa.arapca_birim'e girer.
+  kasa_arapca_uygun boolean GENERATED ALWAYS AS (dil = 'ar' AND (tur = 'ceviri' OR lisans_sinifi = 'telifli')) STORED,
   UNIQUE (kimlik, eser_kimlik),
   UNIQUE (kimlik, eser_kimlik, omurga_uygun),
-  UNIQUE (kimlik, eser_kimlik, kasa_uygun)
+  UNIQUE (kimlik, eser_kimlik, kasa_uygun),
+  UNIQUE (kimlik, eser_kimlik, kasa_arapca_uygun)
 );
 CREATE INDEX ON omurga.baski(eser_kimlik);
 
@@ -544,6 +547,55 @@ END $$;
 CREATE TRIGGER turkce_birim_a_doldur BEFORE INSERT OR UPDATE OF baski_kimlik, eser_kimlik ON kasa.turkce_birim
   FOR EACH ROW EXECUTE FUNCTION kasa.turkce_birim_doldur();
 
+-- Arapça kasa birimi: omurgaya girmeyen Arapça baskının (lisans telifli ya da tür çeviri) metni. Baskı
+-- kasa_arapca_uygun olmalıdır; omurga.metin_birimi ise yalnız omurga_uygun baskı kabul eder, iki küme ayrıktır.
+-- Kimlik/sürüm/RLS kuralları turkce_birim ile aynıdır; metin alanları metin_birimi'ni izler.
+CREATE TABLE kasa.arapca_birim (
+  kimlik uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  surum integer NOT NULL DEFAULT 1,
+  olusturuldu timestamptz NOT NULL DEFAULT now(),
+  guncellendi timestamptz NOT NULL DEFAULT now(),
+  kurum_kimlik uuid NOT NULL REFERENCES kasa.kurum(kimlik),
+  baski_kimlik uuid NOT NULL,
+  eser_kimlik uuid NOT NULL,               -- türetilmiş (baski.eser_kimlik)
+  baski_kasa_arapca_uygun boolean NOT NULL DEFAULT true CHECK (baski_kasa_arapca_uygun),
+  ust_birim_kimlik uuid,
+  birim_turu text NOT NULL CHECK (birim_turu IN ('bolum','bab','fasl','sayfa','paragraf','cumle','obek','ayet','hadis','dipnot','ilave')),
+  sira integer NOT NULL,
+  cilt integer,
+  sayfa text,
+  metin text NOT NULL,                     -- baskıdaki haliyle
+  metin_normal text NOT NULL,
+  lemma_dizisi text[],
+  kok_dizisi text[],
+  mutercim_ilavesi boolean NOT NULL DEFAULT false,
+  UNIQUE (kurum_kimlik, kimlik),
+  UNIQUE (kurum_kimlik, kimlik, eser_kimlik),
+  UNIQUE NULLS NOT DISTINCT (kurum_kimlik, baski_kimlik, ust_birim_kimlik, birim_turu, sira),
+  FOREIGN KEY (baski_kimlik, eser_kimlik, baski_kasa_arapca_uygun) REFERENCES omurga.baski(kimlik, eser_kimlik, kasa_arapca_uygun),
+  FOREIGN KEY (kurum_kimlik, ust_birim_kimlik) REFERENCES kasa.arapca_birim(kurum_kimlik, kimlik)
+);
+CREATE INDEX ON kasa.arapca_birim(kurum_kimlik, baski_kimlik, sira);
+CREATE INDEX arapca_birim_normal_trgm ON kasa.arapca_birim USING gin (metin_normal gin_trgm_ops);
+CREATE INDEX arapca_birim_kok ON kasa.arapca_birim USING gin (kok_dizisi);
+
+CREATE FUNCTION kasa.arapca_birim_doldur() RETURNS trigger LANGUAGE plpgsql
+  SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+DECLARE b omurga.baski%ROWTYPE;
+BEGIN
+  SELECT * INTO b FROM omurga.baski WHERE kimlik = NEW.baski_kimlik;
+  IF FOUND THEN
+    IF NOT b.kasa_arapca_uygun THEN
+      RAISE EXCEPTION 'kasa.arapca_birim yalniz omurgaya girmeyen Arapca baskiya baglanir (dil=%, tur=%, lisans=%)',
+        b.dil, b.tur, b.lisans_sinifi;
+    END IF;
+    NEW.eser_kimlik := b.eser_kimlik;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER arapca_birim_a_doldur BEFORE INSERT OR UPDATE OF baski_kimlik, eser_kimlik ON kasa.arapca_birim
+  FOR EACH ROW EXECUTE FUNCTION kasa.arapca_birim_doldur();
+
 -- Hizalanmış çift: 1-n, n-1, n-m için cift + cift_uye. Çiftin eseri üyelerinden türer (cift_eser görünümü);
 -- elle yazılan eser sütunu yoktur. Bir çiftin tüm üyeleri aynı şerh ağacından olmalıdır (asıl metin + şerhi).
 CREATE TABLE kasa.cift (
@@ -569,25 +621,31 @@ CREATE TABLE kasa.cift_uye (
   kurum_kimlik uuid NOT NULL,
   cift_kimlik uuid NOT NULL,
   taraf text NOT NULL CHECK (taraf IN ('ar','tr')),
-  arapca_birim_kimlik uuid,
+  arapca_birim_kimlik uuid,                -- omurga.metin_birimi (Arapça taraf, ortak omurga)
+  kasa_arapca_birim_kimlik uuid,           -- kasa.arapca_birim (Arapça taraf, telifli/çeviri baskı)
   turkce_birim_kimlik uuid,
   eser_kimlik uuid NOT NULL,               -- türetilmiş: üyenin birimi hangi eserden ise o
   sira integer NOT NULL DEFAULT 0,
-  CHECK ((taraf='ar' AND arapca_birim_kimlik IS NOT NULL AND turkce_birim_kimlik IS NULL)
-      OR (taraf='tr' AND turkce_birim_kimlik IS NOT NULL AND arapca_birim_kimlik IS NULL)),
+  CHECK ((taraf='ar' AND (arapca_birim_kimlik IS NOT NULL)::int + (kasa_arapca_birim_kimlik IS NOT NULL)::int = 1 AND turkce_birim_kimlik IS NULL)
+      OR (taraf='tr' AND turkce_birim_kimlik IS NOT NULL AND arapca_birim_kimlik IS NULL AND kasa_arapca_birim_kimlik IS NULL)),
   FOREIGN KEY (kurum_kimlik) REFERENCES kasa.kurum(kimlik),
   FOREIGN KEY (kurum_kimlik, cift_kimlik) REFERENCES kasa.cift(kurum_kimlik, kimlik),
   FOREIGN KEY (arapca_birim_kimlik, eser_kimlik) REFERENCES omurga.metin_birimi(kimlik, eser_kimlik),
+  FOREIGN KEY (kurum_kimlik, kasa_arapca_birim_kimlik, eser_kimlik) REFERENCES kasa.arapca_birim(kurum_kimlik, kimlik, eser_kimlik),
   FOREIGN KEY (kurum_kimlik, turkce_birim_kimlik, eser_kimlik) REFERENCES kasa.turkce_birim(kurum_kimlik, kimlik, eser_kimlik)
 );
 CREATE INDEX ON kasa.cift_uye(cift_kimlik);
 CREATE INDEX ON kasa.cift_uye(arapca_birim_kimlik);
+CREATE INDEX ON kasa.cift_uye(kasa_arapca_birim_kimlik);
 CREATE INDEX ON kasa.cift_uye(eser_kimlik);
 
 CREATE FUNCTION kasa.cift_uye_doldur() RETURNS trigger LANGUAGE plpgsql
   SECURITY DEFINER SET search_path = pg_catalog, public AS $$
 BEGIN
-  IF NEW.taraf = 'ar' THEN
+  IF NEW.taraf = 'ar' AND NEW.kasa_arapca_birim_kimlik IS NOT NULL THEN   -- RLS: yalnız kendi kurumunun birimi görünür
+    SELECT eser_kimlik INTO NEW.eser_kimlik FROM kasa.arapca_birim
+      WHERE kimlik = NEW.kasa_arapca_birim_kimlik AND kurum_kimlik = NEW.kurum_kimlik;
+  ELSIF NEW.taraf = 'ar' THEN
     SELECT eser_kimlik INTO NEW.eser_kimlik FROM omurga.metin_birimi WHERE kimlik = NEW.arapca_birim_kimlik;
   ELSE   -- RLS: yalnız kendi kurumunun birimi görünür
     SELECT eser_kimlik INTO NEW.eser_kimlik FROM kasa.turkce_birim
@@ -635,12 +693,14 @@ CREATE TABLE kasa.vektor (
   kurum_kimlik uuid NOT NULL REFERENCES kasa.kurum(kimlik),
   cift_kimlik uuid,
   turkce_birim_kimlik uuid,
+  arapca_birim_kimlik uuid,                -- kasa.arapca_birim (telifli Arapça birimin kasadaki vektörü)
   model_kimlik uuid NOT NULL REFERENCES omurga.gomme_modeli(kimlik),
   girdi_ozeti text NOT NULL,
   gomme vector NOT NULL,
-  CHECK ((cift_kimlik IS NOT NULL)::int + (turkce_birim_kimlik IS NOT NULL)::int = 1),
+  CHECK ((cift_kimlik IS NOT NULL)::int + (turkce_birim_kimlik IS NOT NULL)::int + (arapca_birim_kimlik IS NOT NULL)::int = 1),
   FOREIGN KEY (kurum_kimlik, cift_kimlik) REFERENCES kasa.cift(kurum_kimlik, kimlik),
-  FOREIGN KEY (kurum_kimlik, turkce_birim_kimlik) REFERENCES kasa.turkce_birim(kurum_kimlik, kimlik)
+  FOREIGN KEY (kurum_kimlik, turkce_birim_kimlik) REFERENCES kasa.turkce_birim(kurum_kimlik, kimlik),
+  FOREIGN KEY (kurum_kimlik, arapca_birim_kimlik) REFERENCES kasa.arapca_birim(kurum_kimlik, kimlik)
 );
 CREATE INDEX ON kasa.vektor(kurum_kimlik, model_kimlik);
 CREATE FUNCTION kasa.vektor_boyut_denetle() RETURNS trigger LANGUAGE plpgsql
@@ -663,6 +723,9 @@ CREATE VIEW kasa.vektor_eser WITH (security_invoker = true) AS
   SELECT v.kimlik AS vektor_kimlik, v.kurum_kimlik, tb.eser_kimlik
     FROM kasa.vektor v JOIN kasa.turkce_birim tb ON tb.kurum_kimlik = v.kurum_kimlik AND tb.kimlik = v.turkce_birim_kimlik
   UNION ALL
+  SELECT v.kimlik, v.kurum_kimlik, ab.eser_kimlik
+    FROM kasa.vektor v JOIN kasa.arapca_birim ab ON ab.kurum_kimlik = v.kurum_kimlik AND ab.kimlik = v.arapca_birim_kimlik
+  UNION ALL
   SELECT v.kimlik, v.kurum_kimlik, ce.eser_kimlik
     FROM kasa.vektor v JOIN kasa.cift_eser ce ON ce.kurum_kimlik = v.kurum_kimlik AND ce.cift_kimlik = v.cift_kimlik;
 
@@ -675,7 +738,7 @@ BEGIN
   FOREACH t IN ARRAY ARRAY['donem','ekol','eser','baski','metin_birimi','terim','anlam','taniklik','iliski','gomme_modeli','vektor'] LOOP
     PERFORM omurga.kayit_ekle('omurga', t, t <> 'gomme_modeli');
   END LOOP;
-  FOREACH t IN ARRAY ARRAY['turkce_birim','cift','cift_uye','terim_karari','vektor'] LOOP
+  FOREACH t IN ARRAY ARRAY['turkce_birim','arapca_birim','cift','cift_uye','terim_karari','vektor'] LOOP
     PERFORM omurga.kayit_ekle('kasa', t, false);
   END LOOP;
 END $$;
@@ -696,7 +759,7 @@ CREATE TRIGGER kurum_kimlik_tekrar BEFORE INSERT ON kasa.kurum FOR EACH ROW EXEC
 
 -- Yazan işlevler yalnız tetikleyici olarak çalışır; doğrudan çağrılamaz.
 REVOKE EXECUTE ON FUNCTION omurga.surum_izle(), omurga.kimlik_tekrar_yasak(), omurga.varlik_kaydet(),
-  omurga.vektor_doldur_denetle(), kasa.turkce_birim_doldur(), kasa.cift_uye_doldur(),
+  omurga.vektor_doldur_denetle(), kasa.turkce_birim_doldur(), kasa.arapca_birim_doldur(), kasa.cift_uye_doldur(),
   kasa.vektor_boyut_denetle(), kasa.kurum_surum() FROM PUBLIC;
 
 ------------------------------------------------------------------------------
@@ -705,7 +768,7 @@ REVOKE EXECUTE ON FUNCTION omurga.surum_izle(), omurga.kimlik_tekrar_yasak(), om
 DO $$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['turkce_birim','cift','cift_uye','terim_karari','vektor','surum_gecmisi'] LOOP
+  FOREACH t IN ARRAY ARRAY['turkce_birim','arapca_birim','cift','cift_uye','terim_karari','vektor','surum_gecmisi'] LOOP
     EXECUTE format('ALTER TABLE kasa.%I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format('ALTER TABLE kasa.%I FORCE ROW LEVEL SECURITY', t);
     EXECUTE format('CREATE POLICY kurum_izolasyonu ON kasa.%I USING (kurum_kimlik = kasa.gecerli_kurum()) WITH CHECK (kurum_kimlik = kasa.gecerli_kurum())', t);
