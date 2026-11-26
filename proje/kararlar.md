@@ -22,3 +22,4 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 - **Anlam ekol taşımaz (G-010 Ö4):** Ekol, dönem ve müellif yalnızca tanıklıkta durur; `omurga.anlam`'daki ekol/dönem sütunları kaldırılır. Gerekçe: aynı anlam farklı ekollerde tanıklanabilir; ekol bilgisi tanığa aittir.
 - **Kavram kayıtları taslak girer (G-010 Ş1):** Baskıdan okunmuş tanıklığı olmayan hiçbir anlam veya ilişki `onayli` olamaz. Bellekten çıkarılan anlam ayrımları "yüksek güven" taşısa bile taslaktır; bağımsız doğrulama baskı ve insan incelemesiyle yapılır.
 - **Asıl metin ve şerh ayrı eserdir (G-010 Ö2):** Fusûs ana metni ile Konuk şerhi ayrı eser kayıtlarıdır; şerh–asıl metin bağı ilişkiyle kurulur.
+- **Gömme test seti hafızaya girmez (G-005):** degerlendirme/gomme_testi.jsonl çift hafızasına, örnek havuzuna ve kavram ağına konmaz; yalnızca ölçüm içindir.

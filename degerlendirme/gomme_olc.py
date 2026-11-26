@@ -252,8 +252,13 @@ def sirala(kodlayici, belgeler, sorgu_metinleri):
             skorlar = (np.asarray(qv) @ np.asarray(bv).T).tolist()
         except ImportError:
             skorlar = [[_carp(q, d) for d in bv] for q in qv]
-    # eşitlikte kimliğe göre sabit sıra (tekrarlanabilirlik)
-    return [[bids[i] for i in sorted(range(len(bids)), key=lambda i: (-s[i], bids[i]))] for s in skorlar]
+    # Eşitlikte (ör. hiç ortak kelime yok) kimlik sırası altın belgeleri kayırmasın diye
+    # sorgu+kimlik özetine göre sabit ama yansız sıra: tekrarlanabilir, şans düzeyinde.
+    def kirici(q, b):
+        return hashlib.md5((q + "|" + b).encode("utf-8")).hexdigest()
+
+    return [[bids[i] for i in sorted(range(len(bids)), key=lambda i: (-round(s[i], 9), kirici(q, bids[i])))]
+            for q, s in zip(sorgu_metinleri, skorlar)]
 
 
 # ------------------------------------------------------------------ ölçütler
