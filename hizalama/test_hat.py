@@ -62,6 +62,60 @@ class HatTest(unittest.TestCase):
         kotu = hat.leksik_ortak("فَوَصَفَ نَفْسَهُ لَنَا", "Zîrâ melâike halîfe neş’esini görmedi")
         self.assertGreater(iyi, kotu)
 
+    # ---- hat-0.2 (G-027)
+    def test_parantezsiz_ve_alanlar(self):
+        s = hat.hizala(sentetik(), 1)
+        p = s["pasajlar"][0]
+        self.assertNotIn("[", p["tr"])
+        self.assertIn("[ilave söz]", p["tr_parantezli"])
+        self.assertEqual(p["ilaveler"], ["ilave söz"])
+
+    def test_parantez_cumle_siniri_bolmez(self):
+        t = "Önce şunu dedi [birinci kısım; ikinci kısım. üçüncü] ve sonra gitti; ardından döndü."
+        for u in hat.tr_cumleler(t):
+            self.assertEqual(u.count("["), u.count("]"))
+        self.assertEqual(len(hat.tr_cumleler(t)), 2)
+
+    def test_atif_ve_satir_ici_arapca_temizlenir(self):
+        t = "onlar, haysiyetinden {ar: أَ تَجْعَلُ} (Bakara, 2/30) ya’ni “Yâ Rab” dediler."
+        self.assertEqual(hat.parantezsiz(t), "onlar, haysiyetinden “Yâ Rab” dediler.")
+        self.assertEqual(hat.ilave_ve_atiflar(t)[1], ["Bakara, 2/30"])
+        self.assertEqual(hat.tr_cumleler("(Nisâ, 4/1) Ey nâs! Korkun."), ["(Nisâ, 4/1) Ey nâs!", "Korkun."])
+
+    def test_satir_ici_devam_kurali(self):
+        def seg(*m):
+            return {"k": "tr", "bloklar": [blok("terceme", x) for x in m], "idx": [0], "isaretler": []}
+        ar = {"k": "ar", "bloklar": [blok("arapca", "نفثية", dil="ar")], "idx": [0], "isaretler": []}
+        self.assertTrue(hat.devam_mi(seg("onlar neş’et haysiyetinden"), ar, seg("(Bakara, 2/30) ya’ni dediler")))
+        self.assertTrue(hat.devam_mi(seg("Mündemic ["), ar, seg("], ba’dehû")))
+        self.assertFalse(hat.devam_mi(seg("Bitti."), ar, seg("İmdi başka pasaj")))
+
+    def test_butunluk_bayragi(self):
+        b = sentetik()
+        b.insert(5, blok("arapca", "نفثية", dil="ar"))
+        b.insert(6, blok("terceme", "devam eden satır.", dil="tr"))
+        for i, x in enumerate(b):
+            x["sira"] = i
+        s = hat.hizala(b, 1)
+        ana, _, _ = hat.kayitlar(s)
+        pas = [k for k in ana if k["duzey"] == "pasaj"][0]
+        self.assertIn("satir_ici_arapca", pas["butunluk"]["bayraklar"])
+        self.assertFalse(pas["ogretici_uygun"])
+
+    def test_dil_tespit(self):
+        self.assertEqual(hat.dil_tespit("حق جانِ جهان است و جهان جمله بدن"), "fa")
+        self.assertEqual(hat.dil_tespit("وَاللّٰهُ يَخْتَصُّ بِرَحْمَتِهِ مَنْ يَشَاءُ"), "ar")
+
+    def test_kimlik_korunur(self):
+        import tempfile, os
+        ana, alinti, dipnot = hat.kayitlar(hat.hizala(sentetik(), 1))
+        with tempfile.TemporaryDirectory() as d:
+            hat.yaz(os.path.join(d, "fass-01.jsonl"), ana)
+            hat.yaz(os.path.join(d, "fass-01.alinti.jsonl"), alinti)
+            ana2, alinti2, _ = hat.kayitlar(hat.hizala(sentetik(), 1), onceki=d)
+        self.assertEqual([k["id"] for k in ana], [k["id"] for k in ana2])
+        self.assertEqual([k["id"] for k in alinti], [k["id"] for k in alinti2])
+
 
 if __name__ == "__main__":
     unittest.main()
