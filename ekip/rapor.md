@@ -13,4 +13,4 @@ Konuk Fusûs şerhinden Arapça–Türkçe hizalanmış öğretici çiftler → 
 5. Denetim (Mümeyyiz) → ıstılah kararları → dönem sözlüğü kıyası → çeviri motoru.
 
 ## Yan işler
-- Şema son düzeltmesi (G-023, Mimar): sürüyor. Test seti v2 (G-015): sırada.
+- Şema v1 KABUL edildi (Mümeyyiz, gerileme yok). Kavram ağına ilk yazımdan önce küçük bir kontrol (K-2) kalacak. Test seti v2 (G-015): sırada.
