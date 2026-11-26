@@ -1,0 +1,21 @@
+# E-001 Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi
+
+- Kimlik/sürüm: E-001 v1 (2026-11-26, kutuphaneci, G-001)
+- Eser: İbnü'l-Arabî, Fusûsu'l-hikem; Türkçe tercüme ve şerh: Ahmed Avni Konuk
+- Müellif vefat: İbnü'l-Arabî 638/1240 (genel bilgi, bu oturumda kaynakla doğrulanmadı); Konuk 1938 (doğrulanmadı, TDV maddesinden teyit edilecek)
+- Arapça baskı(lar): doğrulanmadı. Şerh, Fusûs metnini paragraf paragraf Arapça verir; hangi neşre (veya nüshaya) dayandığı doğrulanmadı.
+- Tahkik eden (Arapça): doğrulanmadı
+- Türkçe yayın: Mustafa Tahralı ve Selçuk Eraydın neşri (yeni harfe aktarma, notlar, fihristler). Konya Mevlânâ Müzesi Ktp. yazması esas alınmış (kaynak: TDV İA "Konuk, Ahmet Avni", arama özeti; maddenin kendisi okunamadı, ağ engeli).
+  - TDV özetine göre İstanbul'da 4 cilt, 1. cilt 1987, sonrakiler 1994 ve 1999 (cilt-yıl eşlemesi doğrulanmadı).
+  - Marmara Üniv. İlahiyat Fakültesi Vakfı (Dergah), 6. baskı 2013 (kütüphane kaydı); cilt 1: 18.05.2017, ISBN 9789755480374, 520 s.; cilt 3: ISBN 9789755480398, 584 s. (Kitapyurdu kaydı).
+  - Türkiye Yazma Eserler Kurumu Başkanlığı, 2017, ISBN 9789751738822 ve 9789751738905 (kataloglarda 2 cilt, bir makalede I-IV; tutarsız, doğrulanmadı).
+- Çevirmenin dayandığı baskı (önsöz): doğrulanmadı. Önsöz/mukaddime fiziksel kopyadan okunmalı.
+- Sayfa numarası eşlemesi: doğrulanmadı. Yapı gereği Arapça paragraf + Türkçe yan yana; paragraf hizası hazır olma beklentisi (proje/kararlar.md) denetlenmedi.
+- Dijital kaynak: doğrulanmadı (PDF/yayınevi dosyası elde değil). Yayınevi adayları: Marmara Üniv. İlahiyat Vakfı, TYEK.
+- Telif/lisans: HUKUKİ SORU (bkz. ozet.md). Konuk'un vefatı 1938 ise asıl metin için koruma süresi sorusu ayrı; Tahralı-Eraydın aktarımı, notları ve fihristleri ayrı hak doğurabilir. Hüküm verilmedi.
+- Kaynaklar:
+  - https://islamansiklopedisi.org.tr/konuk-ahmet-avni (arama özeti)
+  - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-i/39454.html
+  - https://www.kitapyurdu.com/kitap/fususul-hikem-tercume-ve-serhi-iii/51370.html
+  - https://cir.nii.ac.jp/crid/1130000795811384576?lang=en
+  - https://katalog.bilecik.edu.tr/bib/30021

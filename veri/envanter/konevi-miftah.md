@@ -1,0 +1,21 @@
+# E-004 Konevî, Miftâhu'l-gayb (+ Fenârî, Misbâhu'l-üns)
+
+- Kimlik/sürüm: E-004 v1 (2026-11-26, kutuphaneci, G-001)
+- Eser: Sadreddin Konevî, Miftâhu'l-gaybi'l-cem' ve'l-vücûd (Türkçe: "Tasavvuf Metafiziği"); şerh: Fenârî, Misbâhu'l-üns (şerh künyesi doğrulanmadı)
+- Müellif vefat: Konevî 673/1274, Fenârî 834/1431 (genel bilgi, doğrulanmadı)
+- Arapça baskı(lar): doğrulanmadı
+- Tahkik eden: doğrulanmadı
+- Türkçe çeviri(ler), Demirli:
+  - İstanbul 2002, "Tasavvuf Metafiziği: Miftâh-ı Gaybi'l-cem ve'l-vücûd" (TDV İA özeti; yayınevi doğrulanmadı)
+  - Türkiye Yazma Eserler Kurumu Başkanlığı, 2014, 591 s. (katalog özeti)
+  - 2015 baskı, 207 s. (yayınevi doğrulanmadı; sayfa sayısı farkı ayrı baskı/ayrı eser olabilir, doğrulanmadı)
+  - Yeni baskı 20.01.2026 (Kitapyurdu, yayınevi doğrulanmadı)
+- Çevirmenin dayandığı baskı (önsöz): doğrulanmadı; birden çok baskı olduğundan hangisi için hangi Arapça esas, baskı baskı okunmalı.
+- Sayfa eşlemesi: doğrulanmadı
+- Dijital kaynak: doğrulanmadı
+- Telif/lisans: HUKUKİ SORU. TYEK baskısı kamu kurumu yayınıdır; bu, serbest kullanım anlamına gelmez. Hüküm verilmedi.
+- Kaynaklar:
+  - https://islamansiklopedisi.org.tr/miftahul-gayb (arama özeti; sayfa okunamadı)
+  - https://www.kitapyurdu.com/kitap/tasavvuf-metafizigi-miftahulgayb/743644.html
+  - https://katalog.bilecik.edu.tr/bib/47751
+  - https://dergipark.org.tr/tr/pub/cuid/article/356917
