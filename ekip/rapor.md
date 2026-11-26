@@ -1,10 +1,10 @@
 ## Sizden beklenen
 Konuk'un Fusûs şerhinin dijital kopyası (PDF ya da tarama). G-003 bunu bekliyor.
 
-## Durum
-Heyet kuruldu, ilk yedi görev kartı açıldı. İlk oturumda sıra şöyle olacak: Kâtip depo iskeletini kurar,
-Kütüphaneci envantere, Mimar şemaya başlar. Şema Mümeyyiz denetiminden geçmeden kabul edilmeyecek.
-
-## Maliyet planı
-Opus yalnızca üç yerde: Reis, Istılahçı ve Mümeyyiz. Envanter, metin hazırlama, hizalama kodu ve şema Sonnet ile,
-iskelet işi Haiku ile yürütülecek.
+## Durum (26.11)
+- Ortak kayda erişim doğrulandı.
+- Bitti: G-007 depo iskeleti (Kâtip). veri/kasa/ git dışında.
+- Sürüyor: G-001 envanter (Kütüphaneci), G-002 şema v1 (Mimar), G-004 metin hazırlama (Musahhih),
+  G-005 gömme test seti (Mümeyyiz), G-006 ıstılah protokolü + 30 terim (Istılahçı).
+- G-005'e ait Antigravity kayıtları kurulum testinden kalmaydı; temizlendi, kart Mümeyyiz'de.
+- Sırada: G-002 teslim edilince Mümeyyiz denetimi; G-006 kayıtları da kavram ağına gideceği için denetlenecek.
