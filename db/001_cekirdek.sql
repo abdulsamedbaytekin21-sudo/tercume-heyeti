@@ -409,7 +409,8 @@ BEGIN
   IF NEW.iliski_turu = 'serh_eder' THEN
     SELECT * INTO k FROM omurga.eser WHERE kimlik = NEW.kaynak_kimlik;
     SELECT * INTO h FROM omurga.eser WHERE kimlik = NEW.hedef_kimlik;
-    IF (k.kimlik IS NOT NULL OR h.kimlik IS NOT NULL) AND NOT (k.kimlik IS NOT NULL AND h.kimlik IS NOT NULL AND k.ust_eser_kimlik = h.kimlik) THEN
+    IF (k.kimlik IS NOT NULL OR h.kimlik IS NOT NULL)
+       AND NOT COALESCE(k.kimlik IS NOT NULL AND h.kimlik IS NOT NULL AND k.ust_eser_kimlik = h.kimlik, false) THEN
       RAISE EXCEPTION 'serh_eder kenari eser.ust_eser_kimlik ile uyusmuyor';
     END IF;
   END IF;
