@@ -6,12 +6,8 @@
 3. EVREN_URL ve EVREN_ANAHTAR ortam değişkenleri (G-011 bunu bekliyor).
 
 ## Durum (26.11)
-- Heyete Sözlükçü eklendi (kullanıcı kararı): sözlükler eserden ayrı kaynak; eser, orijinalin dönem sözlükleriyle de kıyaslanır. Görev verilmedi.
-- T-0010 yanıtı: Kütüphaneci G-012.yi bitirdi, boşta. Mümeyyiz'in
-  G-005, G-009, G-010 işleri bitti; şu an boşta, G-002 düzeltmesi gelince yeniden denetleyecek.
-- Bitti: G-001/004/007/008; G-005 gömme test seti ve G-006 ıstılah seti şartlı kabul.
-- G-002 şema denetimden döndü (3 engelleyici: Türkçe metnin omurgaya sızması, test eseri dışlamanın
-  denetimsiz olması, kurumlar arası FK). Mimar düzeltiyor; sonra Mümeyyiz yeniden denetleyecek.
-- Durduruldu (kullanıcı talimatı): G-002 düzeltme (Mimar) ve G-014 test seti gözden geçirme (Istılahçı). Yarım işler ara kayıt olarak depoda; kartlar "sırada".
-- G-012, G-013 bitti (kavram seti v2, hepsi taslak). Fusûs ana metni ayrı eser (E-006). Bekliyor: G-003 (kopya), G-011 (EVREN ayarı).
-- Yeni kararlar proje/kararlar.md'de (şerh dışlaması, anlam ekol taşımaz, kayıtlar taslak girer).
+- Yarıda kalan iki iş bitti: G-014 test setinin Arapça gözden geçirmesi (şartlı kullanılabilir; 4 anlam hatası, 6 etiket düzeltmesi) ve G-002 şema düzeltmeleri (3 engelleyici ve 4 önemli bulgu giderildi).
+- G-002 kabulü için kalan: kasada Arapça birim tablosu (küçük ek, Mimar) + Mümeyyiz'in kısa yeniden denetimi. Onayınızı bekliyor.
+- Açılıp başlatılmayan: G-015 test seti v2 düzeltmeleri (Mümeyyiz, Sonnet).
+- Bekliyor: G-003 (Konuk şerhi kopyası), G-011 (EVREN ayarı). Sözlükçü heyette, görevsiz.
+- Yeni kararlar kararlar.md'de: şerh–asıl bağı tek sütunda; telifli Arapça baskı kasada (geçici).
