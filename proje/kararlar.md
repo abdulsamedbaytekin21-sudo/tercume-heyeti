@@ -19,3 +19,6 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 - **Kurum seçimi (pilot):** Pilotta tek kurum var; korunan sınır omurga–kasa ayrımıdır ve rollerle tutulur. `heyet.kurum` oturum ayarı pilotta kalabilir. İkinci kurum eklenmeden önce kurum başına rol ve `current_user` eşlemesi zorunludur.
 - **Terim kararları kasada durur:** Türkçe karşılık çeviriden türediği için. Omurgaya serbest karşılık gerekirse ayrı arındırma göçü ve hukukçu görüşü gerekir.
 - **Kota (T-0009):** Kullanıcının Claude kotası Pro. Opus yalnızca Mümeyyiz denetimi ve ıstılah/anlam kararlarında; EVREN ölçümü (G-011) sonuçlanınca ucuz işler oraya taşınır.
+- **Anlam ekol taşımaz (G-010 Ö4):** Ekol, dönem ve müellif yalnızca tanıklıkta durur; `omurga.anlam`'daki ekol/dönem sütunları kaldırılır. Gerekçe: aynı anlam farklı ekollerde tanıklanabilir; ekol bilgisi tanığa aittir.
+- **Kavram kayıtları taslak girer (G-010 Ş1):** Baskıdan okunmuş tanıklığı olmayan hiçbir anlam veya ilişki `onayli` olamaz. Bellekten çıkarılan anlam ayrımları "yüksek güven" taşısa bile taslaktır; bağımsız doğrulama baskı ve insan incelemesiyle yapılır.
+- **Asıl metin ve şerh ayrı eserdir (G-010 Ö2):** Fusûs ana metni ile Konuk şerhi ayrı eser kayıtlarıdır; şerh–asıl metin bağı ilişkiyle kurulur.
