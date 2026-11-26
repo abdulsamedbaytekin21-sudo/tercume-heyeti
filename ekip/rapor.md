@@ -8,8 +8,8 @@ Konuk Fusûs şerhinden Arapça–Türkçe hizalanmış öğretici çiftler → 
 ## Aşamalar
 1. Kaynak tespiti: BİTTİ (Konuk kendi tercihli metnini kurmuş; Arapça taraf neşrin içinde).
 2. Metin elde: BİTTİ (TYEK çeviri yazı 1. cilt, 892 s., kasada).
-3. Metin çıkarımı (G-022, Musahhih): SÜRÜYOR. PDF'teki Arapça ters sıra ve bozuk harfle çıkıyor; düzeltiliyor.
-4. İlk fassın hizalanması (G-003, Mukabeleci): 3 bitince.
+3. Metin çıkarımı (G-022, Musahhih): BİTTİ. Tüm cilt çıkarıldı (13.485 blok; 4.498 Arapça, 3.670 tercüme, 3.821 şerh); 6 sayfada elle kontrol, hata görülmedi.
+4. İlk fassın (Fass-ı Âdemî) hizalanması (G-003, Mukabeleci): SÜRÜYOR.
 5. Denetim (Mümeyyiz) → ıstılah kararları → dönem sözlüğü kıyası → çeviri motoru.
 
 ## Yan işler
