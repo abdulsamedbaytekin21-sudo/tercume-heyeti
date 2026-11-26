@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.2, G-027).
+"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.2.1, G-027).
 
 Girdi : G-022 çıktısı temiz.jsonl (blok başına sayfa, sira, tur, dil, metin).
 Çıktı : <cikti>/fass-NN.jsonl           (duzey=pasaj | cumle; kayıt başına kalıcı kimlik + sürüm)
@@ -26,7 +26,7 @@ import re
 import sys
 import unicodedata
 
-SURUM = "hat-0.2"
+SURUM = "hat-0.2.1"
 ESIK_INCELEME = 0.60
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "metin"))
@@ -137,11 +137,11 @@ def _duzelt_bosluk(t):
 
 def parantezsiz(t):
     """Öğretici çiftin Türkçe tarafı: köşeli parantez (neşir ilavesi), atıf parantezi ve {ar:...} parçaları çıkarılır."""
-    # satır içi Arapça (+ atıf) ardından gelen "ya'ni" bağlacı, atılan alıntıyla birlikte düşer
-    t = re.sub(r"(?:\{ar:[^}]*\}\s*)+(?:\([^()]*\d+/\d+[^()]*\)\s*)?[Yy]a[’']ni\s+", " ", t)
-    t = ARMARK_RE.sub(" ", t)
+    # Karar (G-027, Reis): satır içi Arapça ibareler Türkçe tarafta yerinde kalır; yalnız köşeli parantezli
+    # neşir ilaveleri ve atıf parantezleri çıkar. Köşeli parantez içindeki Arapça ilaveyle birlikte düşer.
     t = ILAVE_RE.sub(" ", t)
     t = ATIF_RE.sub(" ", t)
+    t = re.sub(r"\{ar:\s*([^}]*)\}", r" \1 ", t)
     t = re.sub(r"[\[\]]", " ", t)  # kalan tek köşeli parantez (dengesizlik) -> bayrak ayrıca
     return _duzelt_bosluk(t)
 
@@ -160,6 +160,23 @@ def ilave_ve_atiflar(t):
             continue  # (r.a.) (a.s.) benzeri formüller
         paren.append(ic)
     return ilaveler, atiflar, paren
+
+
+def ic_arapca_araliklari(parantezli, temiz):
+    """Temiz Türkçe içinde satır içi Arapça ibarelerin [bas, son) karakter aralıkları."""
+    sonuc, pos = [], 0
+    ilave_disi = ILAVE_RE.sub(" ", parantezli)
+    for m in ARMARK_RE.finditer(ilave_disi):
+        f = re.sub(r"\s+", " ", m.group(0)[4:-1].strip())
+        i = temiz.find(f, pos)
+        if f and i >= 0:
+            sonuc.append({"metin": f, "bas": i, "son": i + len(f)})
+            pos = i + len(f)
+    return sonuc
+
+
+def arapcasiz_say(t):
+    return len(re.sub("[؀-ۿ]+", " ", t).split())
 
 
 def ilavesiz(t):
@@ -203,7 +220,7 @@ def leksik_ortak(ar_metin, tr_metin):
     a = [x for x in a if len(x) >= 3]
     if not a:
         return 0.0
-    t = [tr_iskelet(w) for w in ilavesiz(tr_metin).split() if w.lower().strip("’'.,;:“”") not in _TR_STOP]
+    t = [tr_iskelet(w) for w in re.sub("[؀-ۿ]+", " ", ilavesiz(tr_metin)).split() if w.lower().strip("’'.,;:“”") not in _TR_STOP]
     t = [x for x in t if len(x) >= 3]
     ok = sum(any(x in y for y in t) for x in a)
     return ok / len(a)
@@ -476,7 +493,7 @@ def dp_hizala(ar_u, tr_u):
     """Monoton n-m hizalama. Dönüş: [(ar_idx_listesi, tr_idx_listesi, delta_z, baglac)]"""
     n, m = len(ar_u), len(tr_u)
     la = [max(1, len(AR_LETTER.findall(norm_ar(x)))) for x in ar_u]
-    lt = [max(1, len(re.sub(r"[^\w]", "", ilavesiz(x)))) for x in tr_u]
+    lt = [max(1, len(re.sub(r"[^\w]", "", re.sub("[؀-ۿ]+", "", ilavesiz(x))))) for x in tr_u]
     c = sum(lt) / sum(la)
     s2 = 8.0
     INF = float("inf")
@@ -576,8 +593,16 @@ def sozluk_kur(bloklar):
     return v
 
 
+BILGI_BAYRAKLARI = {"satir_ici_arapca"}  # karar G-027/Reis: bilgi amaçlı, tek başına öğretici uygunluğu düşürmez
+
+
+def kusur(bayraklar):
+    return [b for b in bayraklar if b not in BILGI_BAYRAKLARI]
+
+
 def butunluk(bayraklar):
-    return {"durum": "kontrol" if bayraklar else "temiz", "bayraklar": bayraklar}
+    k = kusur(bayraklar)
+    return {"durum": "kontrol" if k else "temiz", "bayraklar": k, "bilgi": [b for b in bayraklar if b in BILGI_BAYRAKLARI]}
 
 
 def hizala(bloklar, fass_no=1):
@@ -617,6 +642,7 @@ def hizala(bloklar, fass_no=1):
         literal, izah, ic_ar = tr_serisini_ayir(t, birl)
         raw, sayfa_isaret, fn = sayfa_dipnot_ayikla(literal)
         temiz = parantezsiz(raw)
+        ic_aral = ic_arapca_araliklari(raw, temiz)
         ilaveler, atiflar, paren = ilave_ve_atiflar(raw)
         izah_devam = False
         if izah and not TERMINAL.search(izah.rstrip()):
@@ -648,14 +674,17 @@ def hizala(bloklar, fass_no=1):
         yanlis_blok = [norm_ar(bk["metin"]) for a, e, bk in zip(dil_t, etiket, s["bloklar"]) if a != e]
         if tutarsiz or "fa" in dil_t:
             bay.append("dil_etiketi_tutarsiz")
-        if re.search("[؀-ۿ]", temiz):
-            bay.append("tr_icinde_arapca_harf")
+        artik = temiz
+        for a_ in sorted(ic_aral, key=lambda x: -x["bas"]):
+            artik = artik[:a_["bas"]] + " " + artik[a_["son"]:]
+        if re.search("[؀-ۿ]", artik):
+            bay.append("tr_icinde_arapca_harf")  # bildirilmemiş Arapça harf
         if re.search("[A-Za-z0-9]|�", ar):
             bay.append("ar_icinde_latin_ya_da_bozuk")
         ar_kel = len(norm_ar(ar).split())
-        tr_kel = len(temiz.split())
+        tr_kel = arapcasiz_say(temiz)
         pasajlar.append({
-            "s": s, "t": t, "ar": ar, "tr": temiz, "tr_parantezli": raw, "izah": izah_t, "ic_ar": ic_ar,
+            "s": s, "t": t, "ar": ar, "tr": temiz, "ic_aral": ic_aral, "tr_parantezli": raw, "izah": izah_t, "ic_ar": ic_ar,
             "izah_devam": izah_devam, "izah_tamam": (not izah_t) or bool(TERMINAL.search(izah_t.rstrip())),
             "ilaveler": ilaveler, "atiflar": atiflar, "paren": paren, "belirsiz_tire": belirsiz,
             "dil_tutarsiz_blok": tutarsiz, "dil_yanlis_metin": yanlis_blok, "bayraklar": bay,
@@ -762,10 +791,10 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None):
         ana.append(dict(taban, id=pid, duzey="pasaj", ar_id=pid.replace("-p", "-a"), tr_id=pid.replace("-p", "-t"),
                         ar=p["ar"], ar_norm=norm_ar(p["ar"]), tr=p["tr"], tr_parantezli=p["tr_parantezli"],
                         nasir_ilavesi=p["ilaveler"], atiflar=p["atiflar"], parantezler=p["paren"],
-                        tr_izah=p["izah"], tr_izah_tamam=p["izah_tamam"], tr_izah_serhten_devam=p["izah_devam"], tr_satir_ici_arapca=p["ic_ar"], nasir_varyantlari=varyantlar,
+                        tr_izah=p["izah"], tr_izah_tamam=p["izah_tamam"], tr_izah_serhten_devam=p["izah_devam"], tr_satir_ici_arapca=p["ic_aral"], nasir_varyantlari=varyantlar,
                         dipnot_ref=p["fn"], sayfa_isaretleri=p["sayfa_isaret"], esleme="1-1", ar_kelime=p["ar_kel"], tr_kelime=p["tr_kel"],
                         guven=g, gerekce="; ".join(gerekce), yontem="yapi-capa+oran", model="yok (gömme modeli ölçülmedi)",
-                        inceleme=inc, butunluk=but, ogretici_uygun=(inc == "hayır" and not ba),
+                        inceleme=inc, butunluk=but, ogretici_uygun=(inc == "hayır" and not kusur(ba)),
                         tire_belirsiz=p["belirsiz_tire"], kaynak_ar=kaynak(p["s"]["idx"]), kaynak_tr=kaynak(p["t"]["idx"])))
         # ---- cümle düzeyi
         ar_u = ar_cumleler(p["ar"])
@@ -820,14 +849,15 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None):
                         ar=" ".join(ar_u[x] for x in ai), tr=" ".join(tr_u[x] for x in ti),
                         tr_parantezli=" ".join(tr_pu[x] for x in ti),
                         nasir_ilavesi=ilave_ve_atiflar(" ".join(tr_pu[x] for x in ti))[0],
-                        atiflar=ilave_ve_atiflar(" ".join(tr_pu[x] for x in ti))[1], **ek)
+                        atiflar=ilave_ve_atiflar(" ".join(tr_pu[x] for x in ti))[1],
+                        tr_satir_ici_arapca=ic_arapca_araliklari(" ".join(tr_pu[x] for x in ti), " ".join(tr_u[x] for x in ti)), **ek)
 
         if len(ar_u) <= 1 or len(tr_u) <= 1:
             bb = satir_bay(range(len(tr_u)), range(len(ar_u)))
             ana.append(satir(list(range(len(ar_u))), list(range(len(tr_u))), id=cid(ar_u[0] if ar_u else p["ar"]), duzey="cumle",
                              esleme="%d-%d" % (len(ar_u) or 1, len(tr_u) or 1), guven=g,
                              gerekce="cümle düzeyi kurulamadı: bir tarafta tek birim; pasaj düzeyinde bırakıldı",
-                             yontem="tek-birim", model="yok", inceleme=inc, butunluk=butunluk(bb), ogretici_uygun=(inc == "hayır" and not bb)))
+                             yontem="tek-birim", model="yok", inceleme=inc, butunluk=butunluk(bb), ogretici_uygun=(inc == "hayır" and not kusur(bb))))
             continue
         yol = dp_hizala(ar_u, tr_u)
         hesap = [cumle_guveni(ai, ti, z, bon, ov, g) for (ai, ti, z, bon, ov) in yol]
@@ -844,7 +874,7 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None):
             inc_s = "insan" if (cg < ESIK_INCELEME or inc == "insan") else "hayır"
             ana.append(satir(ai, ti, id=cid(ar_u[ai[0]] if ai else p["ar"]), duzey="cumle", esleme="%d-%d" % (len(ai), len(ti)),
                              guven=cg, gerekce=neden, yontem="uzunluk-DP+baglac+leksik", model="yok (gömme modeli ölçülmedi)",
-                             inceleme=inc_s, butunluk=butunluk(bb), ogretici_uygun=(inc_s == "hayır" and not bb)))
+                             inceleme=inc_s, butunluk=butunluk(bb), ogretici_uygun=(inc_s == "hayır" and not kusur(bb))))
 
     # ---- alıntılar
     maks_q = reg["maks_q"]

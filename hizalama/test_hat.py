@@ -78,7 +78,10 @@ class HatTest(unittest.TestCase):
 
     def test_atif_ve_satir_ici_arapca_temizlenir(self):
         t = "onlar, haysiyetinden {ar: أَ تَجْعَلُ} (Bakara, 2/30) ya’ni “Yâ Rab” dediler."
-        self.assertEqual(hat.parantezsiz(t), "onlar, haysiyetinden “Yâ Rab” dediler.")
+        self.assertEqual(hat.parantezsiz(t), "onlar, haysiyetinden أَ تَجْعَلُ ya’ni “Yâ Rab” dediler.")  # Arapça yerinde kalır
+        ar = hat.ic_arapca_araliklari(t, hat.parantezsiz(t))[0]
+        self.assertEqual(hat.parantezsiz(t)[ar["bas"]:ar["son"]], "أَ تَجْعَلُ")
+        self.assertEqual(hat.parantezsiz("a [ilave {ar: نفثية}] b"), "a b")
         self.assertEqual(hat.ilave_ve_atiflar(t)[1], ["Bakara, 2/30"])
         self.assertEqual(hat.tr_cumleler("(Nisâ, 4/1) Ey nâs! Korkun."), ["(Nisâ, 4/1) Ey nâs!", "Korkun."])
 
@@ -99,8 +102,9 @@ class HatTest(unittest.TestCase):
         s = hat.hizala(b, 1)
         ana, _, _ = hat.kayitlar(s)
         pas = [k for k in ana if k["duzey"] == "pasaj"][0]
-        self.assertIn("satir_ici_arapca", pas["butunluk"]["bayraklar"])
-        self.assertFalse(pas["ogretici_uygun"])
+        self.assertIn("satir_ici_arapca", pas["butunluk"]["bilgi"])
+        self.assertNotIn("satir_ici_arapca", pas["butunluk"]["bayraklar"])  # bilgi amaçlı, kusur değil
+        self.assertTrue(pas["tr_satir_ici_arapca"][0]["metin"] == "نفثية")
 
     def test_dil_tespit(self):
         self.assertEqual(hat.dil_tespit("حق جانِ جهان است و جهان جمله بدن"), "fa")
