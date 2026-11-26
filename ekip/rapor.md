@@ -6,8 +6,11 @@
 3. EVREN_URL ve EVREN_ANAHTAR ortam değişkenleri (G-011 bunu bekliyor).
 
 ## Durum (26.11)
-- Bitti: G-007 iskelet, G-004 metin akışı, G-001/G-008 envanter v2 (Nusûs künyesi bulundu; baskılar önsöz bekliyor).
-- Denetimde (Mümeyyiz): G-009 şema v1, G-010 ıstılah protokolü + 30 terim. Sürüyor: G-005 gömme test seti.
-- T-0009 işlendi: main birleştirildi; EVREN ayarı yok, G-011 "bekliyor". Ayar gelene kadar işler Claude ile.
-- Kota: bundan sonra Opus yalnızca Mümeyyiz denetimi ve ıstılah/anlam kararlarında; diğer her şey Sonnet/Haiku.
-- Hukuki sorular H-1..H-5 veri/envanter/ozet.md'de.
+- T-0010 yanıtı: Kütüphaneci şimdi G-012'de (Fusûs ana metni için ayrı eser kaydı). Mümeyyiz'in
+  G-005, G-009, G-010 işleri bitti; şu an boşta, G-002 düzeltmesi gelince yeniden denetleyecek.
+- Bitti: G-001/004/007/008; G-005 gömme test seti ve G-006 ıstılah seti şartlı kabul.
+- G-002 şema denetimden döndü (3 engelleyici: Türkçe metnin omurgaya sızması, test eseri dışlamanın
+  denetimsiz olması, kurumlar arası FK). Mimar düzeltiyor; sonra Mümeyyiz yeniden denetleyecek.
+- Sürüyor: G-002 düzeltme (Mimar), G-012 (Kütüphaneci), G-014 test setinin Arapça gözden geçirmesi (Istılahçı).
+- Sırada: G-013 kavram verisi düzeltmeleri (G-012'den sonra). Bekliyor: G-003 (kopya), G-011 (EVREN ayarı).
+- Yeni kararlar proje/kararlar.md'de (şerh dışlaması, anlam ekol taşımaz, kayıtlar taslak girer).
