@@ -60,12 +60,15 @@ def _istek(yol: str, govde: dict | None = None, deneme: int = 3):
     veri = json.dumps(govde, ensure_ascii=False).encode() if govde is not None else None
     for i in range(deneme):
         istek = urllib.request.Request(url + yol, data=veri, method="POST" if veri else "GET", headers={
-            "Authorization": f"Bearer {anahtar}", "Content-Type": "application/json"})
+            "X-API-Key": anahtar, "Authorization": f"Bearer {anahtar}", "Content-Type": "application/json"})
         try:
             with urllib.request.urlopen(istek, timeout=180) as y:
                 return json.loads(y.read().decode())
         except urllib.error.HTTPError as e:
             govde_hata = e.read().decode(errors="replace")[:300]
+            if "terms_not_accepted" in govde_hata:
+                raise SystemExit("EVREN kullanım şartları onaylanmamış. Bunu kullanıcı kendisi yapmalı "
+                                 "(EVREN > Test Alanı). Kartı 'bekliyor' yap ve rapora yaz.")
             if e.code in (429, 500, 502, 503, 504) and i < deneme - 1:
                 time.sleep(2 ** i * 3)
                 continue
