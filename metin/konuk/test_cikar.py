@@ -186,5 +186,26 @@ class Cilt2(unittest.TestCase):
         self.assertEqual(t, "ب 120")
 
 
+class Cilt2Rakam(unittest.TestCase):
+    """G-036: Arapça yazı tipli küçük rakamlar. Sentetik veri."""
+
+    def test_isaret_ust_indisi_bolunmez(self):
+        # "[25" Garamond, "1" Scheherazade 8.7 pt, "/47]" Garamond
+        chars = [tr("[", 88, 100.0, 92), tr("2", 92, 100.0, 97), tr("5", 97, 100.0, 103),
+                 ch("1", 103, 106, size=8.7, top=96.0), tr("/", 106, 100.0, 110), tr("4", 110, 100.0, 116),
+                 tr("7", 116, 100.0, 122), tr("]", 122, 100.0, 126)]
+        b = cikar.page_blocks(FakeSayfa(chars))
+        self.assertEqual([(x["tur"], x["metin"]) for x in b], [("isaret", "[25¹/47]")])
+
+    def test_dipnot_cagrisi_arapcadan_ayrilir(self):
+        chars = [ch("ب", 90, 94), ch("5", 82, 85, size=8.7, top=96.0), ch("2", 85, 88, size=8.7, top=96.0),
+                 ch("3", 88, 90, size=8.7, top=96.0), ch("،", 94, 96)]
+        b = cikar.page_blocks(FakeSayfa(chars))
+        self.assertEqual(len(b), 1)
+        self.assertEqual(b[0]["tur"], "arapca")
+        self.assertNotRegex(b[0]["metin"], r"\d")
+        self.assertEqual(b[0]["dipnot_ref"], ["523"])
+
+
 if __name__ == "__main__":
     unittest.main()

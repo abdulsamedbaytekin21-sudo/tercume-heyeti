@@ -270,6 +270,35 @@ def _satirlara_ayir(items):
     return satirlar
 
 
+def _arapca_rakamlari_ayir(chars):
+    """Arapça yazı tipiyle dizilmiş küçük (< 10 pt) rakamlar (2. cilt, G-036):
+    * "[25¹/47]" bölüm işaretinin üst indisi ("/" ile devam ediyorsa): Türkçe üst indis yapılır, işaret bütün kalır;
+    * Arapça satıra yapışan dipnot çağrısı ("كشفيًّا،523"): metinden çıkarılır, (rakam, top, x0) olarak döner.
+    1. ciltte böyle karakter yoktur; çıktısı değişmez."""
+    out, refler, i = [], [], 0
+    küçük_rakam = lambda c: c["text"].isdigit() and is_ar(c) and c["size"] < 10
+    while i < len(chars):
+        c = chars[i]
+        if küçük_rakam(c):
+            j = i
+            while j < len(chars) and küçük_rakam(chars[j]):
+                j += 1
+            grup = chars[i:j]
+            while out and out[-1]["text"] == " " and is_ar(out[-1]) and out[-1]["size"] < 10:
+                out.pop()      # rakamın önündeki küçük ayırıcı boşluk
+            onceki_rakam = bool(out) and out[-1]["text"].isdigit()
+            if j < len(chars) and chars[j]["text"] == "/" and onceki_rakam:
+                for g in grup:
+                    out.append({**g, "fontname": "AGaramondPro-Regular", "size": 6.7})
+            else:
+                refler.append(("".join(g["text"] for g in grup), grup[0]["top"], grup[0]["x0"]))
+            i = j
+        else:
+            out.append(c)
+            i += 1
+    return out, refler
+
+
 def _isaret_blok(it):
     return {"tur": "isaret", "dil": "tr", "ham": it["ham"], "metin": it["tem"].strip(), "top": it["top"],
             "x0": it["x0"], "x1": it["x1"], "boyut": it["boyut"], "yazi": it["yazi"]}
@@ -281,7 +310,7 @@ def page_blocks(pg):
     Satır içi Arapçalı Türkçe satırlarda blok sırası: Türkçe | Arapça | Türkçe (G-026).
     Dipnot ayracının altındaki Arapça dipnot bloğunun içinde "{ar: ...}" olarak kalır, gövdeye sızmaz.
     """
-    chars = [c for c in pg.chars if c["text"] != "\x00"]
+    chars, dipnot_refler = _arapca_rakamlari_ayir([c for c in pg.chars if c["text"] != "\x00"])
     sep = None
     for ln in pg.lines + pg.rects:
         if abs(ln["bottom"] - ln["top"]) < 1.5 and 50 < ln["x1"] - ln["x0"] < 320 and ln["top"] > SEP_MIN_TOP:
@@ -308,6 +337,11 @@ def page_blocks(pg):
             fn = min(sorted(set(c["fontname"].split("+")[-1].split("#")[0] for c in run)), key=lambda f: (-sum(1 for c in run if c["fontname"].split("+")[-1].split("#")[0] == f), "Italic" in f))   # eşitlikte italik olmayan, sonra sıralı ilk (küme sırası süreçten sürece değişiyordu)
             items.append({"mod": "tr", "isaret": bool(re.fullmatch(r"\[[\d⁰¹²³⁴⁵⁶⁷⁸⁹]+/\d+\]", tem.strip())), "ham": ham, "tem": tem,
                           "top": top, "x0": x0, "x1": max(c["x1"] for c in run), "boyut": big, "yazi": fn})
+    for rakam, rtop, rx in dipnot_refler:      # dipnot çağrısı, en yakın Arapça parçaya bağlanır
+        ar_items = [it for it in items if it["mod"] == "ar" and abs(it["top"] - rtop) < 25]
+        if ar_items:
+            hedef = min(ar_items, key=lambda it: (0 if it["x0"] - 8 <= rx <= it["x1"] + 8 else 1, abs(it["top"] - rtop)))
+            hedef.setdefault("dipnot_ref", []).append(rakam)
     satirlar = _satirlara_ayir(items)
     for si, sat in enumerate(satirlar):
         for it in sat:
@@ -342,7 +376,8 @@ def page_blocks(pg):
         elif it["mod"] == "ar":
             acik = None
             out.append({"tur": "arapca", "dil": it["dil"], "ham": it["ham"], "metin": it["tem"], "top": it["top"],
-                        "x0": it["x0"], "x1": it["x1"], "boyut": it["boyut"], "yazi": it["yazi"]})
+                        "x0": it["x0"], "x1": it["x1"], "boyut": it["boyut"], "yazi": it["yazi"],
+                        **({"dipnot_ref": it["dipnot_ref"]} if it.get("dipnot_ref") else {})})
         elif it["isaret"]:
             acik = None
             out.append(_isaret_blok(it))
@@ -452,6 +487,8 @@ def main(argv=None):
             bn = basili_no(bl)
             for i, b in enumerate(bl, 1):
                 base = {"sayfa": n, "basili_sayfa": bn, "sira": i, "tur": b["tur"], "dil": b["dil"]}
+                if b.get("dipnot_ref"):
+                    base["dipnot_ref"] = b["dipnot_ref"]   # yalnız Arapça blokta, varsa (G-036)
                 fh.write(json.dumps({**base, "ham": b["ham"], "yazi": b["yazi"], "boyut": round(b["boyut"], 1),
                                      "top": round(b["top"], 1), "x0": round(b["x0"], 1)}, ensure_ascii=False) + "\n")
                 ft.write(json.dumps({**base, "metin": b["metin"]}, ensure_ascii=False) + "\n")
