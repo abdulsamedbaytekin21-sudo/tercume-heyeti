@@ -2,7 +2,7 @@
 
 Kaynak: Ahmed Avni Konuk, Fusûsu'l-Hikem Tercüme ve Şerhi, 1. cilt (TYEK çeviri yazı), PDF 892 s. (InDesign, metin katmanlı).
 Girdi (telifli, değişmedi): `veri/kasa/envanter/konuk1/konuk1.pdf`. Çıktı (telifli): `veri/kasa/metin/konuk1/`.
-Kod: `metin/konuk/cikar.py`, test: `metin/konuk/test_cikar.py` (`cd metin/konuk && python3 -m unittest`, 20 test, sentetik veri).
+Kod: `metin/konuk/cikar.py`, test: `metin/konuk/test_cikar.py` (`cd metin/konuk && python3 -m unittest`, 24 test, sentetik veri).
 Bu dizine telifli metin konmaz; çıktı yalnız kasadadır.
 
 ## Kullanım
@@ -57,3 +57,19 @@ dipnot 445 -> 442 (dipnota giren Arapça satırlar yüzünden birleşen dipnotla
 502 sayfada. U+FDFA: 0 -> 31 blok (açık yazı "صلى الله عليه وسلم" 31 -> 0); U+FDF5 (ﷵ) vb. de korunur.
 Elle kontrol: s. 177, 194, 214, 216, 220 sayfa görüntüsüyle satır satır karşılaştırıldı (Türkçe parçalar ve Arapça sırası birebir); s. 196 dipnot 110/111 `dipnot`ta, gövdede yok.
 Önceki sürüm yedeği çalışma dizininde tutulmadı (yeniden üretim 1 dk).
+
+## 2. cilt (G-033): TYEK 2024, 2. baskı
+Girdi (telifli): `veri/kasa/envanter/yek-827-fusus-konuk/cilt2.pdf` (888 s., E-007). Çıktı (telifli): `veri/kasa/metin/konuk2/` (ham.jsonl, temiz.jsonl, cid_sayim.json).
+Komut: `python3 metin/konuk/cikar.py <cilt2.pdf> veri/kasa/metin/konuk2 --sep-min 100 --indeks-ilk 771` (1. cilt komutu değişmedi; yeni seçeneklerin varsayılanı eski davranıştır).
+**1. cilt çıktısı bayt bayt aynı** (kod değişikliklerinden sonra konuk1 yeniden üretildi, `cmp` ham+temiz: aynı).
+Yazı tipleri 1. ciltle aynı (Scheherazade/Suleymaniye Arapça-Farsça, AGaramond, Nimbus Sans). Farklar ve uyarlamalar:
+1. **Bölüm işareti üst indisli: "[25¹/4]"**. Kod üst indis rakamı dipnot çağrısına çeviriyordu ("[25[^1]/4]", 192 yerde yanlış dipnot çağrısı, s. 411 vd.). Artık rakamdan sonra "/" geliyorsa Unicode üst indis olarak kalır: `[25¹/4]` (191 işaret; 1. ciltte böyle işaret yok). Dipnot çağrıları: 272, hepsinin dipnotu var.
+2. **Dipnot ayracı**: dipnotu sayfanın çoğunu kaplayan sayfalarda (s. 394: ayraç top=117; s. 707: top=225) ayraç 400'ün üstünde kalıyordu; `--sep-min 100` ile yakalanır (cilt 2'de ayraç olan tek bu iki sayfa bu aralıkta, yanlış pozitif yok). Dipnot 284 blok; 4 dipnot çağrısız (s. 251/506, 304/523: varyant çağrısı Arapça içinde ya da yok; 592/19 ve 665/2398: önceki sayfadan devam eden dipnot).
+3. **Dizin sayfaları (s. 771 sonrası)**: üst indis rakamlar dizinde sayfa göndermesidir (kavram/kişi dizinleri; "[^1348]" yanlışı); `--indeks-ilk 771` ile düz rakam kalır.
+4. **UYARI, okunamayan sayfalar: s. 777-782 (Hadis dizini) ve s. 858.** Bu sayfalar TraditionalNaskh yazı tipiyle dizilmiş ve metin katmanı eksik (harfler "(cid:N)" ya da İbrani yer tutucu). Tahmin edilmedi: okunamayan glifler `⟨?⟩` (188 blok). Rakamlar ve bağlı hareke okunur. Hemzeli elif CID'leri (أ 200, إ 204) bu yazı tipinde doğrulanmadı; bu sayfalarda Arapça harekeye güvenilmez. Bu dizin sayfaları çeviri çiftine girmemeli; gerekirse OCR (Arapça Tesseract modeli kurulu değil) ya da elle.
+5. Yeni CID 198 = آ (Suleymaniye, s. 596, görüntüyle doğrulandı: "از آن"); `BILINEN_ALEF_CID`'e eklendi. Arapçadaki rakam dizisi (görsel sırada) ters çevirme sonrası düzeltilir (yalnız Naskh dizin sayfalarında rakam var).
+6. Üst bilgi: çift sayfalarda sayfa no, çubuk ve başlık üst üste biner; `baslik_sayfa` "1262KELİME-İ … │" gibi (boşluksuz) çıkabilir; basılı sayfa numarası yine okunur. Düzeltilmedi (çevirilmeyen üst bilgi).
+Sayılar (12 103 blok, 880 sayfa; s. 1-7 ön bölüm, boş sayfa yok sayıldı): 4 355 arapca (3 849 ar + 314 fa dışında 192 dizin bloğu), 3 734 terceme, 2 663 serh, 284 dipnot, 854 üst bilgi, 158 başlık, 55 isaret. U+FDFA 47 blok (açık yazı 0); `{ar:` yalnız dipnotta (21 parça), gövdede 0.
+Tutarlılık kontrolleri (dizin sayfaları hariç, 4 163 Arapça blok): U+FFFD 0, tatvil 0, elif+hemzeli elif yan yana 0, boşluk+yalın hemze 0, başta hareke 0, `⟨?⟩` 0.
+Elle kontrol (sayfa görüntüsüne karşı, tek okuyucu): s. 200 (iki satır içi Arapça "إذْ …", tercüme, [18/3]), 394 (uzun dipnot 553, ayet), 400 (Fusûs Arapçası, ayetler), 411 ([25¹/3], dipnot 563), 596 (Farsça beyit dipnotu, آ), 700 (karışık ayet satırı + Farsça beyit + dipnot 700). Türkçe parçalar ve Arapça sırası birebir; Arapça harekede küçük baskı sınırı 1. ciltteki gibi (sözcük düzeyinde teyit).
+Not: Türkçe taraf Osmanlıca metnin çeviri yazısıdır (E-007).

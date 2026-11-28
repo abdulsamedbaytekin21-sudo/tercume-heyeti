@@ -20,7 +20,7 @@ import re
 import sys
 import unicodedata
 
-AR_FONTS = ("Scheherazade", "Suleymaniye")
+AR_FONTS = ("Scheherazade", "Suleymaniye", "TraditionalNaskh")   # TraditionalNaskh: 2. cilt dizinleri (s. 777-782, 858)
 HAMZA_ALEF = "أإآٱ"
 FFFD = "�"
 TATWEEL = "ـ"
@@ -28,13 +28,17 @@ PERSIAN = set("پچژگکیھہۀ")
 SUP_MAX = 8.0          # üst indis boyu (altı = dipnot çağrısı)
 BODY_MIN = 10.4        # gövde Türkçe boyu (Garamond 11.5, Nimbus 10.6)
 HEADER_TOP = 70
+SEP_MIN_TOP = 400      # dipnot ayracı en az bu yükseklikte (2. cilt: dipnotu sayfanın çoğunu kaplayan sayfalarda ayraç s. 394'te top=117; --sep-min ile)
+INDEKS = False         # dizin sayfaları: üst indis rakamlar dipnot çağrısı değil, sayfa göndermesidir
+UST_INDIS = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 
 
 # Scheherazade alt kümesinde أَ ve أُ tek glif (CID) olup metin katmanında yalnız U+0623 görünür.
 # CID, pdfminer kancasıyla yazı tipi adına "#<cid>" olarak eklenir (hook_cid).
 # Eşleme sayfa görüntüsünde doğrulandı: s. 84'te 1110 = أَ, 1111 = أُ, 913 = harekesiz أ.
 CID_HAMZA = {1110: "\u064e", 1111: "\u064f"}
-BILINEN_ALEF_CID = {913, 1110, 1111, 914, 912}
+BILINEN_ALEF_CID = {913, 1110, 1111, 914, 912, 198}   # 198 = آ (Suleymaniye, 2. cilt s. 596'da görüntüyle doğrulandı)
+BILINMEYEN = "⟨?⟩"   # metin katmanında karşılığı olmayan glif ((cid:N), İbrani harf yer tutucuları)
 GORULEN_CID = {}
 
 
@@ -142,6 +146,8 @@ def ar_logical(chars):
             t = ""
         elif t == FFFD:
             t = "ا"
+        elif t.startswith("(cid:") or "\u05d0" <= t[:1] <= "\u05ea":
+            t = BILINMEYEN
         elif t in HAMZA_ALEF:
             cid = cid_of(c)
             if cid is not None:
@@ -149,6 +155,8 @@ def ar_logical(chars):
                 t += CID_HAMZA.get(cid, "")
         out.append(t)
     s = "".join(reversed(out))
+    s = re.sub(r"\d+", lambda m: m.group()[::-1], s)   # rakam dizileri görsel sırada gelir; ters çevirme onları bozar
+    s = re.sub("(?:" + re.escape(BILINMEYEN) + "[\u064b-\u065f\u0670]*){2,}", BILINMEYEN, s)
     return ham, clean_ar(s)
 
 
@@ -195,11 +203,15 @@ def tr_line_text(chars, mark_notes):
     out, k = [], 0
     while k < len(chars):
         c = chars[k]
-        if c["size"] < SUP_MAX and c["text"].isdigit():
+        if c["size"] < SUP_MAX and c["text"].isdigit() and not INDEKS:
             j = k
             while j < len(chars) and chars[j]["size"] < SUP_MAX and chars[j]["text"].isdigit():
                 j += 1
-            out.append("[^" + "".join(x["text"] for x in chars[k:j]) + "]")
+            rakam = "".join(x["text"] for x in chars[k:j])
+            if out and out[-1][-1:].isdigit() and j < len(chars) and chars[j]["text"] == "/":
+                out.append(rakam.translate(UST_INDIS))   # "[25¹/4]" bölüm işareti (2. cilt): dipnot çağrısı değil
+            else:
+                out.append("[^" + rakam + "]")
             k = j
         else:
             out.append(c["text"])
@@ -272,7 +284,7 @@ def page_blocks(pg):
     chars = [c for c in pg.chars if c["text"] != "\x00"]
     sep = None
     for ln in pg.lines + pg.rects:
-        if abs(ln["bottom"] - ln["top"]) < 1.5 and 50 < ln["x1"] - ln["x0"] < 320 and ln["top"] > 400:
+        if abs(ln["bottom"] - ln["top"]) < 1.5 and 50 < ln["x1"] - ln["x0"] < 320 and ln["top"] > SEP_MIN_TOP:
             sep = ln["top"]
     items = []
     for mode, run in split_runs(chars):
@@ -293,8 +305,8 @@ def page_blocks(pg):
             if not tem.strip():
                 continue
             big = max(c["size"] for c in run)
-            fn = max(set(c["fontname"].split("+")[-1].split("#")[0] for c in run), key=lambda f: sum(1 for c in run if c["fontname"].split("+")[-1].split("#")[0] == f))
-            items.append({"mod": "tr", "isaret": bool(re.fullmatch(r"\[\d+/\d+\]", tem.strip())), "ham": ham, "tem": tem,
+            fn = min(sorted(set(c["fontname"].split("+")[-1].split("#")[0] for c in run)), key=lambda f: (-sum(1 for c in run if c["fontname"].split("+")[-1].split("#")[0] == f), "Italic" in f))   # eşitlikte italik olmayan, sonra sıralı ilk (küme sırası süreçten sürece değişiyordu)
+            items.append({"mod": "tr", "isaret": bool(re.fullmatch(r"\[[\d⁰¹²³⁴⁵⁶⁷⁸⁹]+/\d+\]", tem.strip())), "ham": ham, "tem": tem,
                           "top": top, "x0": x0, "x1": max(c["x1"] for c in run), "boyut": big, "yazi": fn})
     satirlar = _satirlara_ayir(items)
     for si, sat in enumerate(satirlar):
@@ -417,9 +429,13 @@ def main(argv=None):
     ap.add_argument("cikti")
     ap.add_argument("--ilk", type=int, default=1)
     ap.add_argument("--son", type=int, default=0)
+    ap.add_argument("--sep-min", type=float, default=400, help="dipnot ayracı için en düşük top (2. cilt: 100)")
+    ap.add_argument("--indeks-ilk", type=int, default=0, help="bu PDF sayfasından itibaren üst indis rakamlar düz rakam kalır (dizinler)")
     a = ap.parse_args(argv)
     import os
     hook_cid()
+    global SEP_MIN_TOP, INDEKS
+    SEP_MIN_TOP = a.sep_min
     import pdfplumber
     os.makedirs(a.cikti, exist_ok=True)
     nham = ntem = 0
@@ -427,6 +443,7 @@ def main(argv=None):
             open(os.path.join(a.cikti, "temiz.jsonl"), "w", encoding="utf-8") as ft:
         son = a.son or len(pdf.pages)
         for n in range(a.ilk, son + 1):
+            INDEKS = bool(a.indeks_ilk) and n >= a.indeks_ilk
             bl = page_blocks(pdf.pages[n - 1])
             if not bl and not pdf.pages[n - 1].chars:
                 t = ocr_sayfa(a.pdf, n)

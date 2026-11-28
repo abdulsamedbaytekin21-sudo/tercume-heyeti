@@ -150,5 +150,41 @@ class KarisikSatir(unittest.TestCase):
         self.assertEqual(cikar.clean_ar("ﻻ"), "لا")   # diğer sunum biçimleri NFKC ile standarda iner
 
 
+class Cilt2(unittest.TestCase):
+    """G-033: 2. cilt (TYEK 2024) dizgi farkları. Sentetik veri."""
+
+    def test_bolum_isareti_ust_indisi_dipnot_cagrisi_degil(self):
+        g = G
+        s = [ch("[", 10, font=g, size=11.5), ch("2", 14, font=g, size=11.5), ch("5", 18, font=g, size=11.5),
+             ch("1", 22, font=g, size=6.7, top=95.0), ch("/", 25, font=g, size=11.5), ch("4", 29, font=g, size=11.5),
+             ch("]", 33, font=g, size=11.5)]
+        _, t = cikar.tr_line_text(s, None)
+        self.assertEqual(t, "[25¹/4]")
+        # dipnot çağrısı hâlâ [^n]
+        s2 = [ch("a", 10, font=g, size=11.5), ch("1", 14, font=g, size=6.7, top=95.0), ch("b", 18, font=g, size=11.5)]
+        self.assertEqual(cikar.tr_line_text(s2, None)[1], "a[^1]b")
+
+    def test_dizinde_ust_indis_duz_rakam(self):
+        cikar.INDEKS = True
+        try:
+            s = [ch("a", 10, font=G, size=11.5), ch("1", 14, font=G, size=6.7, top=95.0)]
+            self.assertEqual(cikar.tr_line_text(s, None)[1], "a1")
+        finally:
+            cikar.INDEKS = False
+
+    def test_okunamayan_glif_isaretlenir(self):
+        # TraditionalNaskh: metin katmanında (cid:N) ve İbrani yer tutucu; tahmin edilmez
+        n = "TraditionalNaskh"
+        s = [ch("ب", 10, font=n), ch("(cid:243)", 14, font=n), ch("(cid:220)", 18, font=n), ch("כ", 22, font=n), ch("ك", 26, font=n)]
+        _, t = cikar.ar_logical(s)
+        self.assertEqual(t, "ك⟨?⟩ب")
+
+    def test_arapca_icindeki_rakam_ters_cevrilmez(self):
+        n = "TraditionalNaskh"
+        s = [ch("1", 10, font=n), ch("2", 14, font=n), ch("0", 18, font=n), ch(" ", 22, font=n), ch("ب", 26, font=n)]
+        _, t = cikar.ar_logical(s)
+        self.assertEqual(t, "ب 120")
+
+
 if __name__ == "__main__":
     unittest.main()
