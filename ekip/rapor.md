@@ -1,16 +1,12 @@
 ## Sizden beklenen
-1. Sıradaki adım için onay (aşağıda "Öneri").
-2. Demirli Fusûs ve "Vahdet-i Vücûd ve Esasları": iç kapak + önsöz fotoğrafı. 3. EVREN_URL (G-011).
-4. İnsan inceleme kuyruğu: Fass-ı Âdemî'de 50 cümle çifti sizin (ya da bir uzmanın) bakmasını bekliyor.
+1. Vektörleme için Google AI Studio'dan Gemini API anahtarı (güvenli formla verilecek; sohbete yazmayın).
+2. Demirli ve Konevî çevirilerinin kitapları (açık kaynakta bulunamazsa).
 
-## Hedef
-Konuk Fusûs şerhinden Arapça–Türkçe hizalanmış öğretici çiftler → sonra çeviri ve güven notu.
-
-## Aşamalar
-1. Kaynak tespiti: BİTTİ. 2. Metin elde: BİTTİ (Konuk 1. cilt). 3. Metin çıkarımı: BİTTİ (tüm cilt, düzeltilmiş).
-4–5. Fass-ı Âdemî hizalama + denetim: BİTTİ, KABUL. 199 cümle çifti, 147'si öğretici veri; 3 örneklemde anlam hatası 0.
-6. Sıradaki: ıstılah kararlarının çiftlerden çıkarılması (Istılahçı) ve dönem sözlüğü kıyası (Sözlükçü).
-
-## Öneri
-Ya (a) aynı hattı 1. ciltteki diğer fasslara uygulamak (veri büyür, eşik kalibre olur),
-ya (b) önce Fass-ı Âdemî üzerinde 6. aşamayı denemek (ıstılah + sözlük kıyası). Reis'in önerisi: (a) 2 fass daha, sonra (b).
+## Süreç
+| Adım | Durum |
+|---|---|
+| 1. Eser bulmak | Konuk 1. cilt elde. Açık kaynak taraması SÜRÜYOR (Konuk 2. cilt, Kayserî, Konevî vb.). |
+| 2. Hizalamak | Fass-ı Âdemî bitti. 1. ciltte kalan fasslar SÜRÜYOR. |
+| 3. Vektörlemek | API anahtarı bekleniyor. |
+| 4. Çeviri ajanının referans alması | 3'ten sonra. |
+| 5. Geri bildirim ve eğitim | 4'ten sonra. |
