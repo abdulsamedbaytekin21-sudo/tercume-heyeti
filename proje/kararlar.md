@@ -45,3 +45,4 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 ## 2026-11-28
 - **Telif kısıtı kaldırıldı (kullanıcı kararı):** Kullanıcı telifin şu aşamada iş kısıtı olmadığını belirtti. Telifli metin dış hizmetlere (ör. vektör API'si) gönderilebilir. Kasa ayrımı veri düzeni olarak korunur. Korsan/gölge kütüphane kaynakları yine kullanılmaz.
 - **Süreç (kullanıcı tanımı):** eser bul → hizala → vektörle → çeviri ajanı referans alsın → geri bildirim ve eğitimle en az hataya. Raporlar bu beş adıma göre verilir.
+- **Konuk baskısı (G-030):** 1. cilt için elde olan ve hizalaması denetlenen 2017 (1. baskı) esas kalır; 2. cilt için TYEK 2024 (2. baskı) kullanılır. Her çift hangi baskıdan geldiğini taşır. İki baskı arasındaki farklar ileride 1. cilt için karşılaştırılacak.
