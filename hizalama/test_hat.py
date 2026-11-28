@@ -225,6 +225,29 @@ class HatTest(unittest.TestCase):
         self.assertTrue(hat.devam_mi(seg("Ve ammâ bu kelime tenzîhi takdîm etti."), ar, seg("“Seni tenzîh ederim”;"), True, onc))
         self.assertFalse(hat.devam_mi(seg("Ve ammâ bu kelime tenzîhi takdîm etti."), ar, seg("“Seni tenzîh ederim”;"), True, hat.norm_ar("başka metin tamamen")))
 
+    def test_artik_yonlu(self):
+        # fazla "Böyle olunca" birimi sondadır -> yalnız sonraki komşu (G-037)
+        y = hat.artik_suphe(["فإذا حَصَلَ له هذا الاستعدادُ تَجَلَّى له التَّجَلِّي"],
+                            ["Binâenaleyh bu isti’dâd hâsıl oldukda tecellî eder.", "Böyle olunca, kalb Hakk’ı görür;"])
+        self.assertEqual(y, "sonraki")
+        self.assertIsNone(hat.artik_suphe(["فَمَرْجِعُ الرَّسولِ إلى الولايةِ"], ["Resûlün mercii velâyettir."]))
+
+    def test_farsca_ye(self):
+        self.assertFalse(hat.farsca_mi("تعالی اللّٰه عمّا يقولون علوا كبيرا فسبحانه وتعالى عن ذلك كله"))   # tek ی
+        self.assertEqual(hat.dil_tespit("هرکسی را نیك و بد از خود رسد"), "fa")   # işlev sözcükleri yakalar
+        self.assertTrue(hat.farsca_mi("چون گل از خار است"))
+
+    def test_tamlik_bolunmus_arapca(self):
+        # ardışık Arapça bloklar (araya yalnız işaret girmiş) farklı kayıtlara düşerse hata (G-034 Ö-1)
+        b = [blok("arapca", "فَصُّ حِكْمَةٍ", sira=0, dil="ar"), blok("arapca", "كَلَامٌ طَوِيلٌ عَنْ أَمْرٍ", sira=1, dil="ar"),
+             blok("isaret", "[25¹/47]", sira=2), blok("arapca", "وَبَقِيَّةُ الْكَلَامِ هُنَا", sira=3, dil="ar"), blok("terceme", "Türkçe.", sira=4)]
+        kay = lambda i: {"ilk": {"sayfa": 100, "sira": i[0]}, "son": {"sayfa": 100, "sira": i[1]}}
+        alinti = [{"id": "q1", "ar": "كَلَامٌ طَوِيلٌ عَنْ أَمْرٍ", "kaynak_ar": kay((1, 1))}]
+        ana = [{"duzey": "pasaj", "id": "p1", "ar_parantezli": "وَبَقِيَّةُ الْكَلَامِ هُنَا", "kaynak_ar": kay((3, 3)), "kaynak_tr": kay((4, 4)), "tr_parantezli": "Türkçe."},
+               {"duzey": "cumle", "ust": "p1", "ar_parantezli": "وَبَقِيَّةُ الْكَلَامِ هُنَا", "tr_parantezli": "Türkçe."}]
+        h = hat.tamlik_kontrol(ana, alinti, b, 1, 5)
+        self.assertTrue(any("bölünmüş" in x[1] for x in h))
+
 
 if __name__ == "__main__":
     unittest.main()

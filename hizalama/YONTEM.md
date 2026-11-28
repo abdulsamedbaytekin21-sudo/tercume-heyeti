@@ -39,3 +39,10 @@ Kod: `hizalama/hat.py`, test: `cd hizalama && python3 -m unittest`. Çıktı (te
 - `--cilt 2`: girdi `konuk2/temiz.jsonl`, çıktı `veri/kasa/hizalama/fusus-konuk-c2/`, kimlik `fusus-konuk-c2-fNN-pNNNN-cNN`; fass numarası cilt içi sıradır (1 = Fusûs 15. fass, Îsâ). Son fassın sonu `LUGATÇE|KAYNAKÇA|ÂYET İNDEKSİ` başlığında biter (`fass_sinirlari(..., son_baslik)`); Lugatçe, Kaynakça ve dizinler Fusûs metni değildir.
 - Mûsâ fassı iki kez şerh edilmiştir (başlıkta `[2. Şerh]`, PDF s. 513); cilt-içi fass 11 ve 12 aynı Arapça fassın iki şerhidir. Fass 12 kayıtlarında `serh_no: 2`. Fass 12 pasajlarının yalnız 14/46'sı fass 11 ile aynı Arapçayla başlar (ikinci şerh Arapçayı farklı bölümlüyor); aynı Arapçanın iki Türkçesini eğitimde çift sayma kararı Reis'indir.
 - Yankı kuralı: Türkçe paragraf, hemen önceki Fusûs Arapçasının parçalarını satır içi yeniden alıntılıyorsa (<=3 blok, Arapçası öncekinin içinde aynen geçiyor) yeni pasaj açılmaz. Cilt 1 çıktısı bu kuralla bayt bayt aynı kaldı.
+
+## hat-0.3.1 (G-037)
+- **Komşu bayrağı yönlü:** `artik_suphe` kaymanın yönünü döndürür (`kayma_yonu`: `onceki` | `sonraki` | `ikisi`): şüpheli birim satırın ilk birimiyse önceki, son birimiyse sonraki komşuya `komsu_suphe` konur (fazla "fe-" birimi sondaki birimdir). Çıktıda şüpheli satırda `kayma_yonu` alanı.
+- **Farsça ye:** `farsca_mi` Farsça ye (ی, U+06CC) için en az 3 adet ve harflerin %3'ünü ister; Arapça metindeki tek `تعالی` artık `dil_etiketi_tutarsiz` doğurmaz. گ چ پ ژ ۀ ہ eskisi gibi %1 eşikli.
+- **Tamlık kontrolü:** araya yalnız `isaret` / `baslik_sayfa` / `dipnot` giren ardışık Arapça bloklar farklı kayıtlara (pasaj/alıntı) düşerse `TAMLIK HATASI` (bölünmüş Fusûs Arapçası).
+- **`dislama_birimi`:** aynı Arapça fass başlığını taşıyan şerhler (cilt 2 Mûsâ, iki şerh) aynı kimliği taşır; eser bazında dışarıda bırakmada tek birimdir. İki tercüme eğitimde kalır (G-035 kararı).
+- Girdi G-036 çıkarımı (Arapça blokta rakam yok, `[25¹/47]` tek `isaret` bloğu; Arapça blokta isteğe bağlı `dipnot_ref` hizalamada kullanılmıyor, Arapça tarafa karışmaz).

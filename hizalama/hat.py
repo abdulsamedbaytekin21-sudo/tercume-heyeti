@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.3, G-032).
+"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.3.1, G-037).
 
 Girdi : G-022 çıktısı temiz.jsonl (blok başına sayfa, sira, tur, dil, metin).
 Çıktı : <cikti>/fass-NN.jsonl           (duzey=pasaj | cumle; kayıt başına kalıcı kimlik + sürüm)
@@ -19,6 +19,7 @@ Gömme modeli (LaBSE, BGE-M3) bu ortamda yok; ölçülmedi. Yöntem 'kural+uzunl
 Telifli metin yalnız veri/kasa/ altına yazılır; bu dosya veri içermez.
 """
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -26,7 +27,7 @@ import re
 import sys
 import unicodedata
 
-SURUM = "hat-0.3"
+SURUM = "hat-0.3.1"
 ESIK_INCELEME = 0.60
 ESIK_BANT_ALT = 0.55   # 0.55 <= pasaj güveni < 0.60: pasaj 'kenar'; satır güveni belirleyici (G-032, Ö-eşik)
 # Sözcük oranı (ln TR/AR) dağılımı: fass-1..14 havuzundan SÜRÜME SABİTLENDİ (G-032). Bir pasajın puanı başka
@@ -491,9 +492,18 @@ ALINTI_TR = re.compile(r"^(Tercüme|Îzâhen|Ya[’']ni\s*:)")
 IZAH_TR = re.compile(r"^Ya[’']ni\b")
 
 
+FARSI_YE = "ی"   # Farsça ye (U+06CC): Arapça metinde de ('تعالی') tek tük görülür (G-037, K-1)
+
+
 def farsca_mi(metin):
+    """Farsça'ya özgü harf (گ چ پ ژ ۀ ہ) oranı > %1; Farsça ye (ی) tek başına yeterli değildir:
+    en az 3 adet ve harflerin %3'ü olmalı (Arapça içinde tek 'تعالی' Farsça sayılmaz)."""
     harf = AR_LETTER.findall(metin)
-    return bool(harf) and len(FARSI_ONLY.findall(metin)) / len(harf) > 0.01
+    if not harf:
+        return False
+    kesin = len(re.findall("[گچپژۀہ]", metin))
+    ye = metin.count(FARSI_YE)
+    return kesin / len(harf) > 0.01 or (ye >= 3 and ye / len(harf) > 0.03)
 
 
 _FA_SOZ = {"است", "را", "که", "این", "آن", "چه", "نيست", "بود", "گر", "همي", "كز", "وز", "اي", "كي", "خود", "ز", "مي", "نه"}
@@ -664,28 +674,40 @@ def _skel_sayi(metin, ar=True):
 FA_TR = re.compile(r"^(?:İmdi|Binâenaleyh|Böyle olunca|Şu hâlde)\b")
 
 
+def _yon(j, n):
+    """n birimli satırda j. birim şüpheliyse kaymanın yönü: ilk birim -> önceki satır, son birim -> sonraki satır."""
+    if n >= 2 and j == 0:
+        return "onceki"
+    if n >= 2 and j == n - 1:
+        return "sonraki"
+    return "ikisi"
+
+
 def artik_suphe(ar_birimler, tr_birimler):
     """G-032 (Ö-1): 1-2 / 2-1 (n-m) satırda kısa (<=3 sözcük) bir birimin karşı tarafla kök örtüşmesi sıfırsa şüphe:
-    komşu satıra ait kısa artık olabilir. Anlam yargısı değil, kontrol bayrağıdır."""
+    komşu satıra ait kısa artık olabilir. Anlam yargısı değil, kontrol bayrağıdır.
+
+    G-037: dönüş değeri kaymanın yönüdür ("onceki" | "sonraki" | "ikisi"); şüphe yoksa None. Komşu bayrağı yalnız o yöne konur.
+    """
     if len(ar_birimler) == 1 and len(tr_birimler) == 1:
-        return False
+        return None
     ar_hepsi, tr_hepsi = " ".join(ar_birimler), " ".join(tr_birimler)
     if len(tr_birimler) >= 2:
-        for u in tr_birimler:
+        for j, u in enumerate(tr_birimler):
             if len(re.sub("[؀-ۿ]+", " ", ilavesiz(u)).split()) <= 3 and leksik_siki(ar_hepsi, u) == 0.0:
-                return True
+                return _yon(j, len(tr_birimler))
     # Arapça "fe-" (ف) başlı birim sayısından fazla "İmdi/Binâenaleyh/Böyle olunca/Şu hâlde" ile başlayan Türkçe birim:
     # fazla olan, komşu Arapça birimin karşılığıdır (ör. F12 p0011-c06, F1 p0007-c03)
     if len(tr_birimler) >= 2:
         fa_ar = sum(1 for w in norm_ar(ar_hepsi).split() if w.startswith("ف") and len(w) >= 3)
-        fa_tr = sum(1 for u in tr_birimler if FA_TR.match(ilavesiz(u)))
-        if fa_tr > fa_ar:
-            return True
+        fa_idx = [j for j, u in enumerate(tr_birimler) if FA_TR.match(ilavesiz(u))]
+        if len(fa_idx) > fa_ar:
+            return _yon(fa_idx[-1], len(tr_birimler))   # fazla olan sondaki "fe-" birimi
     if len(ar_birimler) >= 2:
-        for a in ar_birimler:
+        for j, a in enumerate(ar_birimler):
             if len(a.split()) <= 4 and not re.search("[﴿﴾«»]", a) and _skel_sayi(a) >= 1 and leksik_siki(a, tr_hepsi) == 0.0:
-                return True
-    return False
+                return _yon(j, len(ar_birimler))   # çevirisi bu satırda olmayan Arapça birim: karşılığı o yöndeki komşuda
+    return None
 
 
 def pasaj_guveni(ar_kelime, tr_kelime, ort_ln_oran, sd_ln, ic_ar, farsca, ov):
@@ -833,7 +855,7 @@ def hizala(bloklar, fass_no=1, min_sayfa=40, son_baslik=None):
             "ilaveler": ilaveler, "atiflar": atiflar, "paren": paren, "belirsiz_tire": belirsiz,
             "dil_tutarsiz_blok": tutarsiz, "dil_yanlis_metin": yanlis_blok, "bayraklar": bay,
             "sayfa_isaret": sorted(set(s["isaretler"] + t["isaretler"] + sayfa_isaret)),
-            "fn": sorted(set(fn + fn2)), "ar_kel": ar_kel, "tr_kel": tr_kel,
+            "fn": sorted(set(fn + fn2 + [int(x) for bk in s["bloklar"] for x in bk.get("dipnot_ref", [])])), "ar_kel": ar_kel, "tr_kel": tr_kel,
         })
     # G-032 (Y-1): Arapçası bir önceki pasajın Arapçasında/satır içi Arapçasında aynen geçen kısa "pasaj" sahtedir
     kalan = []
@@ -851,7 +873,7 @@ def hizala(bloklar, fass_no=1, min_sayfa=40, son_baslik=None):
     dip_ref_idx = {}
     for i in range(bas, bit):
         if bloklar[i]["tur"] not in ("dipnot", "baslik_sayfa"):
-            for n_ in FN_REF.findall(bloklar[i]["metin"]):
+            for n_ in FN_REF.findall(bloklar[i]["metin"]) + [str(x) for x in bloklar[i].get("dipnot_ref", [])]:
                 dip_ref_idx.setdefault(int(n_), i)
 
     # alıntı kayıtlarının dil bilgisi
@@ -906,6 +928,9 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None, ki
                 "son": {"sayfa": bl[idx[-1]]["sayfa"], "basili": bl[idx[-1]]["basili_sayfa"], "sira": bl[idx[-1]]["sira"]}}
 
     taban = {"surum": SURUM, "eser_ar": eser_ar, "eser_tr": eser_tr, "fass": fass_no}
+    if sonuc["baslik"]:
+        # Eser bazında dışarıda bırakma birimi: aynı Arapça fass başlığını taşıyan şerhler (Mûsâ'nın iki şerhi) tek birimdir (G-035 kararı)
+        taban["dislama_birimi"] = "%s-d%s" % (kimlik_oneki, hashlib.sha1(_bosluksuz(norm_ar(sonuc["baslik"]["ar"])).encode()).hexdigest()[:6])
     if sonuc["baslik"] and re.search(r"\[(\d)\. Şerh\]", sonuc["baslik"]["tr"]):
         # Konuk bazı fassları iki kez şerh eder (cilt 2, Mûsâ): ikinci şerh aynı Arapça fassı yeniden verir
         taban["serh_no"] = int(re.search(r"\[(\d)\. Şerh\]", sonuc["baslik"]["tr"]).group(1))
@@ -1041,18 +1066,21 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None, ki
             continue
         for ((ai, ti, z, bon, ov), (cg, neden)) in zip(yol, hesap):
             bb = satir_bay(ti, ai) if ti else list(ba)
-            if ti and ai and artik_suphe([ar_u[x] for x in ai], [tr_u[x] for x in ti]) and "artik_oge_suphe" not in bb:
+            yon_ = artik_suphe([ar_u[x] for x in ai], [tr_u[x] for x in ti]) if (ti and ai) else None
+            if yon_ and "artik_oge_suphe" not in bb:
                 bb.append("artik_oge_suphe")   # G-032 (Ö-1)
             inc_s = "insan" if (cg < ESIK_INCELEME or (inc == "insan" and g < ESIK_BANT_ALT)) else "hayır"
             ana.append(satir(ai, ti, id=cid(ar_u[ai[0]] if ai else p["ar"], ar_pu[ai[0]] if ai else None), duzey="cumle", esleme="%d-%d" % (len(ai), len(ti)),
                              guven=cg, gerekce=neden, yontem="uzunluk-DP+baglac+leksik", model="yok (gömme modeli ölçülmedi)",
-                             inceleme=inc_s, butunluk=butunluk(bb), ogretici_uygun=(inc_s == "hayır" and not kusur(bb))))
+                             inceleme=inc_s, butunluk=butunluk(bb), ogretici_uygun=(inc_s == "hayır" and not kusur(bb)),
+                             **({"kayma_yonu": yon_} if yon_ else {})))
 
     # Kısa artık kayması komşu satırı da kısmi yapar (G-031 Ö-1): şüpheli satırın yanındaki satırlar öğretici dışı
     sat = [k for k in ana if k["duzey"] == "cumle"]
     for i_, k in enumerate(sat):
         if "artik_oge_suphe" in k["butunluk"]["bayraklar"]:
-            for j_ in (i_ - 1, i_ + 1):
+            yon_ = k.get("kayma_yonu", "ikisi")   # G-037: yalnız kayma yönündeki komşu
+            for j_ in {"onceki": (i_ - 1,), "sonraki": (i_ + 1,)}.get(yon_, (i_ - 1, i_ + 1)):
                 if 0 <= j_ < len(sat) and sat[j_]["ust"] == k["ust"] and "artik_oge_suphe" not in sat[j_]["butunluk"]["bayraklar"] \
                         and "komsu_suphe" not in sat[j_]["butunluk"]["bayraklar"]:
                     bl_ = sat[j_]["butunluk"]["bayraklar"] + ["komsu_suphe"]
@@ -1118,15 +1146,22 @@ def tamlik_kontrol(ana, alinti, bloklar, bas, bit):
         return [bloklar[i]["metin"] for i in range(i0, i1 + 1) if bloklar[i]["tur"] == "arapca"], range(i0, i1 + 1)
 
     kapsanan = set()
+    kayit_ar = {}   # Arapça blok indeksi -> (tür, kayıt kimliği): yalnız kaydın kendi Arapça serisi
     for k in ana:
         if k["duzey"] == "pasaj":
             bl, rng = kaynak_ar(k["kaynak_ar"])
+            for i in rng:
+                if bloklar[i]["tur"] == "arapca":
+                    kayit_ar[i] = ("pasaj", k["id"])
             kapsanan.update(rng)
             kapsanan.update(kaynak_ar(k["kaynak_tr"])[1])   # Türkçe paragrafın içindeki satır içi Arapça bloklar
             if _bosluksuz(norm_ar(" ".join(bl))) != _bosluksuz(norm_ar(k["ar_parantezli"])):
                 hata.append((k["id"], "pasaj Arapçası kaynak değil"))
     for k in alinti:
         bl, rng = kaynak_ar(k["kaynak_ar"])
+        for i in rng:
+            if bloklar[i]["tur"] == "arapca":
+                kayit_ar[i] = ("alinti", k["id"])
         kapsanan.update(rng)
         if "kaynak_tr" in k:
             kapsanan.update(kaynak_ar(k["kaynak_tr"])[1])
@@ -1139,6 +1174,19 @@ def tamlik_kontrol(ana, alinti, bloklar, bas, bit):
         b = bloklar[i]
         if b["tur"] == "arapca" and i not in kapsanan and len(AR_LETTER.findall(norm_ar(b["metin"]))) > 3:
             hata.append(("blok %d (s. %s)" % (i, b["sayfa"]), "Arapça blok hiçbir kayda bağlanmadı: " + b["metin"][:30]))
+    # Fusûs Arapçası bölünmüş mü? Araya yalnız işaret / sayfa başlığı / dipnot giren ardışık Arapça bloklar aynı kayıtta
+    # olmalı; biri pasaja öbürü alıntıya gittiyse (G-034 Ö-1: kırık sayfa işareti) hata.
+    onceki_i = None
+    for i in range(bas, bit):
+        t = bloklar[i]["tur"]
+        if t in ("isaret", "baslik_sayfa", "dipnot"):
+            continue
+        if t == "arapca" and i in kayit_ar:
+            if onceki_i is not None and kayit_ar[onceki_i] != kayit_ar[i]:
+                hata.append((kayit_ar[onceki_i][1] + " | " + kayit_ar[i][1], "ardışık Arapça bloklar farklı kayıtlara düşmüş (bölünmüş Fusûs Arapçası, s. %s)" % bloklar[i]["sayfa"]))
+            onceki_i = i
+        else:
+            onceki_i = None
     pas = {k["id"]: k for k in ana if k["duzey"] == "pasaj"}
     satirlar = {}
     for k in ana:
