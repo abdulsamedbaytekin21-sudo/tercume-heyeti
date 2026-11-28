@@ -120,6 +120,12 @@ class HatTest(unittest.TestCase):
         self.assertEqual([k["id"] for k in ana], [k["id"] for k in ana2])
         self.assertEqual([k["id"] for k in alinti], [k["id"] for k in alinti2])
 
+    def test_ar_cumleler_iki_parca_kisa_son(self):
+        # K-6 (G-029, fass 9): 2 parçadan sonuncusu <6 harf iken IndexError veriyordu
+        out = hat.ar_cumleler("فَاعْلَمْ أَنَّ الْأَمْرَ كَذَلِكَ فِي الْعَالَمِ كُلِّهِ، لَا")
+        self.assertEqual(len(out), 1)
+        self.assertTrue(out[0].endswith("لَا"))
+
 
 if __name__ == "__main__":
     unittest.main()

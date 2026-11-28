@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.2.1, G-027).
+"""Mukabeleci: Konuk Fusûs şerhinden bir fassın Arapça-Türkçe hizalama hattı (sürüm hat-0.2.2, G-027).
 
 Girdi : G-022 çıktısı temiz.jsonl (blok başına sayfa, sira, tur, dil, metin).
 Çıktı : <cikti>/fass-NN.jsonl           (duzey=pasaj | cumle; kayıt başına kalıcı kimlik + sürüm)
@@ -26,7 +26,7 @@ import re
 import sys
 import unicodedata
 
-SURUM = "hat-0.2.1"
+SURUM = "hat-0.2.2"
 ESIK_INCELEME = 0.60
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "metin"))
@@ -288,7 +288,8 @@ def ar_cumleler(t):
         else:
             out.append(p)
     if len(out) > 1 and len(AR_LETTER.findall(norm_ar(out[-1]))) < 6:
-        out[-2] = out[-2] + " " + out.pop()
+        son = out.pop()
+        out[-1] += " " + son
     return out
 
 
