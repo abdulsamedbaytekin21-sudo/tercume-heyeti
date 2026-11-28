@@ -36,7 +36,7 @@ ORAN_SD0 = 0.12   # havuz MAD-sd 0.107, std 0.117
 ORAN_C = 0.3         # n=7: sd 0.43, n=11: 0.20, n=22: 0.13, n>=40: ~0.10 (MAD)
 # Cilt ayarları (G-032): cilt -> (girdi, çıktı, kimlik öneki, fass başlığı için en küçük PDF sayfası)
 CILT_AYAR = {
-    1: {"girdi": "veri/kasa/metin/konuk1/temiz.jsonl", "cikti": "veri/kasa/hizalama/fusus-konuk", "kimlik": "fusus-konuk", "min_sayfa": 40},
+    1: {"girdi": "veri/kasa/metin/konuk1/temiz.jsonl", "cikti": "veri/kasa/hizalama/fusus-konuk", "kimlik": "fusus-konuk", "min_sayfa": 40, "son_baslik": None},
 }
 
 
@@ -44,7 +44,7 @@ def cilt_ayari(cilt):
     if cilt in CILT_AYAR:
         return CILT_AYAR[cilt]
     return {"girdi": "veri/kasa/metin/konuk%d/temiz.jsonl" % cilt, "cikti": "veri/kasa/hizalama/fusus-konuk-c%d" % cilt,
-            "kimlik": "fusus-konuk-c%d" % cilt, "min_sayfa": 0}
+            "kimlik": "fusus-konuk-c%d" % cilt, "min_sayfa": 0, "son_baslik": r"^(LUGATÇE|KAYNAKÇA|ÂYET İNDEKSİ)$"}
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "metin"))
 try:
@@ -79,7 +79,7 @@ def yukle(yol):
         return [json.loads(l) for l in f if l.strip()]
 
 
-def fass_sinirlari(bloklar, no=1, min_sayfa=40):
+def fass_sinirlari(bloklar, no=1, min_sayfa=40, son_baslik=None):
     """Fass başlığı (Arapça 'فص حكمة ...') bloğundan sonraki fass başlığının basmalasına kadar.
 
     Dönüş: (baslik_idx, bitis_idx_dahil_degil). no: 1 = ilk fass.
@@ -92,6 +92,12 @@ def fass_sinirlari(bloklar, no=1, min_sayfa=40):
         raise ValueError("fass başlığı bulunamadı")
     bas = basliklar[no - 1]
     bit = basliklar[no] if len(basliklar) > no else len(bloklar)
+    if son_baslik and bit == len(bloklar):
+        # cildin son fassı: Lugatçe/Kaynakça/dizinler Fusûs metni değildir (G-034)
+        for i in range(bas, len(bloklar)):
+            if bloklar[i]["tur"] == "baslik" and re.match(son_baslik, bloklar[i]["metin"].strip()):
+                bit = i
+                break
     # sonraki fassın başındaki basmala/numara bloklarını dışarıda bırak
     while bit > bas and bloklar[bit - 1]["tur"] in ("arapca", "serh") and len(bloklar[bit - 1]["metin"]) <= 3:
         bit -= 1
@@ -414,13 +420,19 @@ def _son_metin(seg):
     return t.rstrip()
 
 
-def devam_mi(onceki, arap, sonraki, oncesi_ar=False):
+def devam_mi(onceki, arap, sonraki, oncesi_ar=False, ar_oncesi=""):
     """tr + ar + tr üçlüsünde Arapça satır içi mi (Türkçe paragraf devam ediyor mu)?
 
     Sonraki Türkçe büyük harfle (ya da tırnak/[ ile) başlamıyorsa, ya da önceki Türkçe cümle bitirilmemişse
     ve araya giren Arapça kısaysa (<= 6 blok) devam sayılır.
     """
     ilk = PAGE_MARK.sub(" ", sonraki["bloklar"][0]["metin"]).lstrip()
+    # G-034 (cilt 2): Türkçe, Fusûs Arapçasının parçalarını satır içi yeniden alıntılar; bu Arapça hemen öncesindeki
+    # Fusûs Arapçasının içinde aynen geçiyorsa yeni pasaj değil, yankıdır (aynı Türkçe paragraf)
+    if ar_oncesi:
+        a = norm_ar(" ".join(b["metin"] for b in arap["bloklar"]))
+        if len(a) >= 5 and a in ar_oncesi and len(arap["bloklar"]) <= 3:
+            return True
     # G-032 (Y-1): "Sehl dedi:" + satır içi Arapça + "[meal]" / "(atıf)" / "Ya'ni ..." = aynı Türkçe paragraf
     # Yalnız Türkçe seri bir Fusûs Arapçasının hemen ardındaysa (yoksa "Şiir:" gibi etiketli beyit pasajı yetim kalır).
     izahli = any(IZAH_TR.match(b["metin"]) for b in onceki["bloklar"])   # îzâh paragrafından sonra gelen Arapça yeni pasajdır
@@ -443,16 +455,18 @@ def satir_ici_birlestir(segs):
         if (
             s["k"] == "tr" and i + 2 < len(segs)
             and segs[i + 1]["k"] == "ar" and segs[i + 2]["k"] == "tr"
-            and devam_mi(s, segs[i + 1], segs[i + 2], i > 0 and segs[i - 1]["k"] == "ar")
+            and devam_mi(s, segs[i + 1], segs[i + 2], i > 0 and segs[i - 1]["k"] == "ar",
+                         norm_ar(" ".join(b["metin"] for b in segs[i - 1]["bloklar"])) if i > 0 and segs[i - 1]["k"] == "ar" else "")
         ):
             oncesi_ar = i > 0 and segs[i - 1]["k"] == "ar"
+            ar_oncesi = norm_ar(" ".join(b["metin"] for b in segs[i - 1]["bloklar"])) if oncesi_ar else ""
             s = dict(s)
             s["parcalar"] = s.get("parcalar") or [("tr", s["bloklar"])]
             s["isaretler"] = list(s["isaretler"])
             while (
                 i + 2 < len(segs)
                 and segs[i + 1]["k"] == "ar" and segs[i + 2]["k"] == "tr"
-                and devam_mi(s, segs[i + 1], segs[i + 2], oncesi_ar)
+                and devam_mi(s, segs[i + 1], segs[i + 2], oncesi_ar, ar_oncesi)
             ):
                 s["parcalar"].append(("ar_ic", segs[i + 1]["bloklar"]))
                 s["parcalar"].append(("tr", segs[i + 2]["bloklar"]))
@@ -728,8 +742,8 @@ def butunluk(bayraklar):
     return {"durum": "kontrol" if k else "temiz", "bayraklar": k, "bilgi": [b for b in bayraklar if b in BILGI_BAYRAKLARI]}
 
 
-def hizala(bloklar, fass_no=1, min_sayfa=40):
-    bas, bit = fass_sinirlari(bloklar, fass_no, min_sayfa)
+def hizala(bloklar, fass_no=1, min_sayfa=40, son_baslik=None):
+    bas, bit = fass_sinirlari(bloklar, fass_no, min_sayfa, son_baslik)
     segs, dipnot_bloklari = segmentle(bloklar, bas, bit)
     segs = satir_ici_birlestir(segs)
     dipnotlar = dipnotlari_coz(dipnot_bloklari)
@@ -892,6 +906,9 @@ def kayitlar(sonuc, fass_no=1, eser_ar="E-006", eser_tr="E-001", onceki=None, ki
                 "son": {"sayfa": bl[idx[-1]]["sayfa"], "basili": bl[idx[-1]]["basili_sayfa"], "sira": bl[idx[-1]]["sira"]}}
 
     taban = {"surum": SURUM, "eser_ar": eser_ar, "eser_tr": eser_tr, "fass": fass_no}
+    if sonuc["baslik"] and re.search(r"\[(\d)\. Şerh\]", sonuc["baslik"]["tr"]):
+        # Konuk bazı fassları iki kez şerh eder (cilt 2, Mûsâ): ikinci şerh aynı Arapça fassı yeniden verir
+        taban["serh_no"] = int(re.search(r"\[(\d)\. Şerh\]", sonuc["baslik"]["tr"]).group(1))
     if sonuc["baslik"]:
         b = sonuc["baslik"]
         ana.append(dict(taban, id="%s-b0001" % kimlik, duzey="baslik", ar_id="%s-a-b0001" % kimlik, tr_id="%s-t-b0001" % kimlik,
@@ -1171,7 +1188,7 @@ def main(argv=None):
     girdi, cikti = a.girdi or ay["girdi"], a.cikti or ay["cikti"]
     onceki = a.onceki or en_yeni_surum_dizini(cikti)
     bloklar = yukle(girdi)
-    sonuc = hizala(bloklar, a.fass, ay["min_sayfa"])
+    sonuc = hizala(bloklar, a.fass, ay["min_sayfa"], ay.get("son_baslik"))
     ana, alinti, dipnot = kayitlar(sonuc, a.fass, onceki=onceki if os.path.isdir(onceki) else None, kimlik_oneki=ay["kimlik"])
     os.makedirs(cikti, exist_ok=True)
     hatalar = tamlik_kontrol(ana, alinti, bloklar, sonuc["bas"], sonuc["bit"])

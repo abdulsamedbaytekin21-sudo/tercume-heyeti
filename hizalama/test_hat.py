@@ -208,6 +208,23 @@ class HatTest(unittest.TestCase):
         ana, _, _ = hat.kayitlar(hat.hizala(sentetik(), 1, 0), 1, kimlik_oneki="fusus-konuk-c2")
         self.assertTrue(all(k["id"].startswith("fusus-konuk-c2-f01-") for k in ana))
 
+    def test_son_fass_dizin_disinda(self):
+        b = sentetik()
+        b.append(blok("baslik", "LUGATÇE"))
+        b.append(blok("serh", "A abd: kul"))
+        b[-2]["sira"], b[-1]["sira"] = 98, 99
+        bas, bit = hat.fass_sinirlari(b, 2, 0, r"^(LUGATÇE|KAYNAKÇA)$")
+        self.assertEqual(b[bit]["metin"], "LUGATÇE")
+        self.assertEqual(hat.fass_sinirlari(b, 2, 0)[1], len(b))
+
+    def test_yanki_arapca_ayni_paragraf(self):
+        def seg(*m):
+            return {"k": "tr", "bloklar": [blok("terceme", x) for x in m], "idx": [0], "isaretler": []}
+        ar = {"k": "ar", "bloklar": [blok("arapca", "سُبْحَانَكَ", dil="ar")], "idx": [0], "isaretler": []}
+        onc = hat.norm_ar("فقال وَقَدَّمَ التَّنْزِيهَ ﴿سُبْحَانَكَ﴾ فَحَدَّدَ")
+        self.assertTrue(hat.devam_mi(seg("Ve ammâ bu kelime tenzîhi takdîm etti."), ar, seg("“Seni tenzîh ederim”;"), True, onc))
+        self.assertFalse(hat.devam_mi(seg("Ve ammâ bu kelime tenzîhi takdîm etti."), ar, seg("“Seni tenzîh ederim”;"), True, hat.norm_ar("başka metin tamamen")))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -34,3 +34,8 @@ Kod: `hizalama/hat.py`, test: `cd hizalama && python3 -m unittest`. Çıktı (te
 - **Kenar bandı:** 0.55 <= pasaj güveni < 0.60 `bant: kenar`; pasaj kaydı `insan` kalır, satırlar kendi güvenine (>= 0.60) göre karar verir. Tek birimli pasajda (1 Arapça ya da 1 Türkçe birim) kenar bandında satır güveni uzunluk + leksik ile hesaplanır.
 - **Yapısal tamlık kontrolü** (`tamlik_kontrol`, her koşuda): pasaj/alıntı Arapçası kaynak bloklarla aynı; her Arapça blok bir pasaj/alıntı/başlık/satır içi Arapça kaydına bağlı; cümle satırları birleşince pasaj Arapçası ve Türkçesi çıkıyor. Hata `TAMLIK HATASI` olarak stderr'e yazılır, özet satırında `tamlık`.
 - Kimlik koruma: cümle kimliği çok birimli eski satırın ilk birimiyle de eşleşir (önek karşılaştırması).
+
+## hat-0.3, cilt 2 notları (G-034)
+- `--cilt 2`: girdi `konuk2/temiz.jsonl`, çıktı `veri/kasa/hizalama/fusus-konuk-c2/`, kimlik `fusus-konuk-c2-fNN-pNNNN-cNN`; fass numarası cilt içi sıradır (1 = Fusûs 15. fass, Îsâ). Son fassın sonu `LUGATÇE|KAYNAKÇA|ÂYET İNDEKSİ` başlığında biter (`fass_sinirlari(..., son_baslik)`); Lugatçe, Kaynakça ve dizinler Fusûs metni değildir.
+- Mûsâ fassı iki kez şerh edilmiştir (başlıkta `[2. Şerh]`, PDF s. 513); cilt-içi fass 11 ve 12 aynı Arapça fassın iki şerhidir. Fass 12 kayıtlarında `serh_no: 2`. Fass 12 pasajlarının yalnız 14/46'sı fass 11 ile aynı Arapçayla başlar (ikinci şerh Arapçayı farklı bölümlüyor); aynı Arapçanın iki Türkçesini eğitimde çift sayma kararı Reis'indir.
+- Yankı kuralı: Türkçe paragraf, hemen önceki Fusûs Arapçasının parçalarını satır içi yeniden alıntılıyorsa (<=3 blok, Arapçası öncekinin içinde aynen geçiyor) yeni pasaj açılmaz. Cilt 1 çıktısı bu kuralla bayt bayt aynı kaldı.
