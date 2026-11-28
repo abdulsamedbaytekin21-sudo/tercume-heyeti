@@ -51,3 +51,5 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 - **Mûsâ fassının iki şerhi (G-034):** Konuk Mûsâ fassını iki kez şerh etmiştir; aynı Arapçanın iki tercümesi iki ayrı çift olarak tutulur (`serh_no`). İkisi aynı eser ve fass sayılır; dışlama ve test bölmesinde birlikte hareket eder.
 - **Mûsâ fassının iki tercümesi eğitimde (G-035):** Türkçeleri büyük ölçüde farklı olduğundan (aynı Arapçalı 162 satırdan yalnız 4'ü aynı Türkçe) iki çift de eğitimde kalır; ikisi tek dışlama birimidir.
 - **Komşu bayrağı yönlü (G-035):** `komsu_suphe` yalnız kaymanın yönündeki komşuya konur; `artik_oge_suphe` kalır.
+- **Hizalama aşaması tamamlandı (G-038):** Fusûs'un 27 fassı Konuk'la hizalandı (hat-0.3.1): 3.302 öğretici cümle çifti (1. cilt 1.482, 2. cilt 1.820). Son kontrolde yeni giren 30 çiftte hata 0.
+- **Eksik Türkçeli pasaj (G-038):** Türkçesinin bir kısmı dipnotta kalan pasajlar (ör. c2 F12 p0052) pasaj düzeyinde de öğretici dışıdır. hat-0.4'te kural olarak uygulanacak; o zamana kadar bu pasaj elle hariç tutulur.
