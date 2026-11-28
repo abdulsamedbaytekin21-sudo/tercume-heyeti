@@ -49,3 +49,5 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 
 - **Hizalama hat-0.3 (G-032):** Sözcük oranı parametreleri sürüme sabit (ln oran ort 0.24, sd0 0.12, kısa pasaj için C/n terimi); kenar bandı (0.55-0.60) için satır güveni belirleyici; ilave dolu + satır içi Arapça yok satır öğretici dışı; kısa artık şüphesi ve komşu satırlar öğretici dışı; sahte pasajlar (harfî tercümesi boş / Arapçası öncekinde geçen) alıntıya. Cilt parametresi (`--cilt`) ve cilt başına kimlik öneki eklendi. Ayrıntı: hizalama/YONTEM.md. Hat-0.2.2 çıktısı `veri/kasa/hizalama/fusus-konuk/surum/hat-0.2.2/` altında.
 - **Mûsâ fassının iki şerhi (G-034):** Konuk Mûsâ fassını iki kez şerh etmiştir; aynı Arapçanın iki tercümesi iki ayrı çift olarak tutulur (`serh_no`). İkisi aynı eser ve fass sayılır; dışlama ve test bölmesinde birlikte hareket eder.
+- **Mûsâ fassının iki tercümesi eğitimde (G-035):** Türkçeleri büyük ölçüde farklı olduğundan (aynı Arapçalı 162 satırdan yalnız 4'ü aynı Türkçe) iki çift de eğitimde kalır; ikisi tek dışlama birimidir.
+- **Komşu bayrağı yönlü (G-035):** `komsu_suphe` yalnız kaymanın yönündeki komşuya konur; `artik_oge_suphe` kalır.
