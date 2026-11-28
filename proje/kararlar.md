@@ -41,3 +41,7 @@ Her karar tarih, karar, gerekçe biçiminde eklenir. Eski kararlar silinmez; de�
 - **İlk öğretici veri kabul edildi (G-028):** Fass-ı Âdemî, hat-0.2.1: 24 pasaj, 199 cümle çifti; 147'si öğretici uygun. Üç bağımsız örneklemde (20 + 36 + 30 çift) anlam hatası 0; öğretici kümede tahmini sınır kusuru ~%3.
 - **Neşir ilaveli satırlar (G-028 K-A):** `nasir_ilavesi` dolu olan cümle satırı, ilavenin karşıladığı Arapça işaretlenene kadar öğretici veri dışında tutulur (hat-0.3).
 - **Güven eşiği (G-028):** Pasaj güveninin sapma ölçüsü hat sürümüne sabitlenecek ya da birden çok fasstan hesaplanacak; bir pasajın puanı başka pasajların metnine bağlı olmamalı. Eşiğin kendisi en az 2–3 fass daha denetlenmeden değiştirilmez. Model denetimi insan onayı yerine geçmez; insan inceleme kuyruğu ayrı tutulur.
+
+## 2026-11-28
+- **Telif kısıtı kaldırıldı (kullanıcı kararı):** Kullanıcı telifin şu aşamada iş kısıtı olmadığını belirtti. Telifli metin dış hizmetlere (ör. vektör API'si) gönderilebilir. Kasa ayrımı veri düzeni olarak korunur. Korsan/gölge kütüphane kaynakları yine kullanılmaz.
+- **Süreç (kullanıcı tanımı):** eser bul → hizala → vektörle → çeviri ajanı referans alsın → geri bildirim ve eğitimle en az hataya. Raporlar bu beş adıma göre verilir.
